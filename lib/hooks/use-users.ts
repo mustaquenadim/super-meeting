@@ -6,7 +6,7 @@ import type { Role, User } from "@/lib/api/types"
 import { supabase } from "@/lib/supabase"
 
 type UserRoleRow = {
-  role?: Role | null
+  role?: Role | Role[] | null
 }
 
 type UserRow = {
@@ -70,9 +70,10 @@ async function fetchUserApi<T>(path: string, init: RequestInit) {
 }
 
 function normalizeUserRow(row: UserRow): User {
-  const roles = (row.user_roles ?? [])
-    .map((entry) => entry.role)
-    .filter(Boolean) as Role[]
+  const roles = (row.user_roles ?? []).flatMap((entry) => {
+    if (!entry.role) return []
+    return Array.isArray(entry.role) ? entry.role : [entry.role]
+  })
 
   return {
     id: row.id,

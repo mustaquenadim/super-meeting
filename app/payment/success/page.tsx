@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
@@ -11,7 +12,7 @@ function normalizeParam(value: string | null) {
   return value?.trim() || null
 }
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const params = useSearchParams()
   const paymentId = normalizeParam(
     params.get("paymentId") ?? params.get("PaymentId")
@@ -94,5 +95,13 @@ export default function PaymentSuccessPage() {
         </Card>
       </div>
     </main>
+  )
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={null}>
+      <PaymentSuccessContent />
+    </Suspense>
   )
 }

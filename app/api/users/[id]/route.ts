@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import type { Role } from "@/lib/api/types"
 import { requireAdminRequest } from "@/lib/server/supabase"
@@ -58,14 +58,14 @@ async function loadUser(serviceClient: ServiceClient, userId: number) {
 }
 
 export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   const authContext = await requireAdminRequest(request)
   if ("error" in authContext) return authContext.error
 
   const { serviceClient } = authContext
-  const { id: idParam } = params
+  const { id: idParam } = await context.params
   const userId = Number(idParam)
 
   if (!Number.isFinite(userId)) {
@@ -210,14 +210,14 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   const authContext = await requireAdminRequest(request)
   if ("error" in authContext) return authContext.error
 
   const { serviceClient } = authContext
-  const { id: idParam } = params
+  const { id: idParam } = await context.params
   const userId = Number(idParam)
 
   if (!Number.isFinite(userId)) {
