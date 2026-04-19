@@ -1,6 +1,6 @@
 import { z } from "zod/v3"
 
-export type AuthMode = "login" | "register"
+export type AuthMode = "login"
 
 export const getAuthSchema = (mode: AuthMode) =>
   z
@@ -10,31 +10,7 @@ export const getAuthSchema = (mode: AuthMode) =>
       password: z.string().min(6, "Password must be at least 6 characters"),
       confirmPassword: z.string().trim().optional(),
     })
-    .superRefine((values, ctx) => {
-      if (mode === "register" && !values.name) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["name"],
-          message: "Name is required",
-        })
-      }
-
-      if (mode === "register" && !values.confirmPassword) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["confirmPassword"],
-          message: "Confirm your password",
-        })
-      }
-
-      if (mode === "register" && values.confirmPassword !== values.password) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["confirmPassword"],
-          message: "Passwords do not match",
-        })
-      }
-    })
+    .superRefine((_values, _ctx) => {})
 
 export type AuthFormValues = z.infer<ReturnType<typeof getAuthSchema>>
 

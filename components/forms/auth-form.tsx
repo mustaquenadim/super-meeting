@@ -29,18 +29,17 @@ import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { supabase } from "@/lib/supabase"
 
-type AuthMode = "login" | "register" | "forgot-password"
+type AuthMode = "login" | "forgot-password"
 
 export function AuthForm({ mode }: { mode: AuthMode }) {
   const router = useRouter()
   const [authError, setAuthError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [checkingSession, setCheckingSession] = useState(true)
-  const isRegister = mode === "register"
   const isForgotPassword = mode === "forgot-password"
 
-  const loginRegisterForm = useForm<AuthFormValues>({
-    resolver: zodResolver(getAuthSchema(isForgotPassword ? "login" : mode)),
+  const loginForm = useForm<AuthFormValues>({
+    resolver: zodResolver(getAuthSchema("login")),
     defaultValues: {
       name: "",
       email: "",
@@ -117,26 +116,6 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
     }
 
     const { email, password } = values as AuthFormValues
-
-    if (isRegister) {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { full_name: (values as AuthFormValues).name },
-        },
-      })
-
-      if (error) {
-        setAuthError(error.message)
-        return
-      }
-
-      setSuccessMessage(
-        "Registration successful! Check your inbox to verify your email address."
-      )
-      return
-    }
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -236,19 +215,13 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = loginRegisterForm
+  } = loginForm
   return (
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">
-            {mode === "login" ? "Welcome back" : "Create an account"}
-          </CardTitle>
-          <CardDescription>
-            {mode === "login"
-              ? "Login with your email and password"
-              : "Create an account with your email and password"}
-          </CardDescription>
+          <CardTitle className="text-xl">Welcome back</CardTitle>
+          <CardDescription>Login with your email and password</CardDescription>
         </CardHeader>
         <CardContent>
           {successMessage ? (
@@ -258,22 +231,6 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           ) : null}
           <form onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
-              {isRegister && (
-                <Field>
-                  <FieldLabel htmlFor="name">Name</FieldLabel>
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="John Doe"
-                    {...register("name")}
-                  />
-                  {errors.name && (
-                    <FieldDescription className="text-destructive">
-                      {errors.name.message}
-                    </FieldDescription>
-                  )}
-                </Field>
-              )}
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
@@ -310,46 +267,15 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
                   <FieldError>{errors.password.message}</FieldError>
                 )}
               </Field>
-              {isRegister && (
-                <Field>
-                  <FieldLabel htmlFor="confirm-password">
-                    Confirm Password
-                  </FieldLabel>
-                  <Input
-                    id="confirm-password"
-                    type="password"
-                    placeholder="********"
-                    {...register("confirmPassword")}
-                  />
-                  {errors.confirmPassword && (
-                    <FieldError>{errors.confirmPassword.message}</FieldError>
-                  )}
-                </Field>
-              )}
               <Field>
                 <Button type="submit" disabled={isSubmitting}>
-                  {mode === "login" ? "Login" : "Register"}
+                  Login
                 </Button>
                 {authError ? (
                   <FieldDescription className="text-center text-destructive">
                     {authError}
                   </FieldDescription>
                 ) : null}
-                {mode === "login" ? (
-                  <FieldDescription className="text-center">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/auth/register" className="text-primary">
-                      Sign up
-                    </Link>
-                  </FieldDescription>
-                ) : (
-                  <FieldDescription className="text-center">
-                    Already have an account?{" "}
-                    <Link href="/auth/login" className="text-primary">
-                      Login
-                    </Link>
-                  </FieldDescription>
-                )}
               </Field>
             </FieldGroup>
           </form>

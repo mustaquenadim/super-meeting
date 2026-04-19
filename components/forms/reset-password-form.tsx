@@ -149,7 +149,7 @@ export function ResetPasswordForm() {
 
     setSuccessMessage("Password updated successfully. You can now sign in.")
 
-    await supabase.auth.signOut()
+    await supabase.auth.signOut({ scope: "local" })
     router.push("/auth/login")
   }
 
