@@ -82,6 +82,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
+import { useTranslations } from "next-intl"
 import type { User } from "@/lib/api/types"
 import {
   useUsers,
@@ -109,6 +110,8 @@ const DEFAULT_COLUMN_ORDER: UserColumnKey[] = [
 ]
 
 export default function UsersPage() {
+  const t = useTranslations("users")
+  const tCommon = useTranslations("common")
   const [searchQuery, setSearchQuery] = React.useState("")
   const [roleFilter, setRoleFilter] = React.useState("all")
   const [selectedIds, setSelectedIds] = React.useState<Set<number>>(
@@ -138,18 +141,18 @@ export default function UsersPage() {
 
   const userColumns = React.useMemo<Record<UserColumnKey, ColumnDefinition>>(
     () => ({
-      user: { label: "User", sortable: true, defaultVisible: true },
-      email: { label: "Email", sortable: true, defaultVisible: true },
-      roles: { label: "Roles", sortable: true, defaultVisible: true },
-      joined: { label: "Joined", sortable: true, defaultVisible: true },
+      user: { label: t("table.user"), sortable: true, defaultVisible: true },
+      email: { label: t("table.email"), sortable: true, defaultVisible: true },
+      roles: { label: t("table.roles"), sortable: true, defaultVisible: true },
+      joined: { label: t("table.joined"), sortable: true, defaultVisible: true },
       actions: {
-        label: "Actions",
+        label: t("table.actions"),
         sortable: false,
         defaultVisible: true,
         hideable: false,
       },
     }),
-    []
+    [t]
   )
 
   const {
@@ -266,7 +269,7 @@ export default function UsersPage() {
     )
     const failed = results.filter((r) => r.status === "rejected").length
     if (failed === 0) {
-      toast.success("Selected users deleted successfully.")
+      toast.success(t("messages.bulkDeleteSuccess"))
     }
     setIsBulkDeleteDialogOpen(false)
     clearSelection()
@@ -304,11 +307,11 @@ export default function UsersPage() {
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!createFormData.name.trim() || !createFormData.email.trim()) {
-      toast.error("Name and email are required.")
+      toast.error(t("messages.nameEmailRequired"))
       return
     }
     if (createFormData.password !== createFormData.password_confirmation) {
-      toast.error("Passwords do not match.")
+      toast.error(t("messages.passwordsDontMatch"))
       return
     }
 
@@ -344,14 +347,14 @@ export default function UsersPage() {
   const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!editingUser || !editFormData.name.trim()) {
-      toast.error("Name is required.")
+      toast.error(t("messages.nameRequired"))
       return
     }
     if (
       editFormData.password &&
       editFormData.password !== editFormData.password_confirmation
     ) {
-      toast.error("Passwords do not match.")
+      toast.error(t("messages.passwordsDontMatch"))
       return
     }
 
@@ -441,15 +444,15 @@ export default function UsersPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Users</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
           <p className="text-muted-foreground">
-            Manage user accounts, roles, and access for the CVSecurity system.
+            {t("description")}
           </p>
         </div>
         {canCreateUsers && (
           <Button onClick={() => setIsCreateDialogOpen(true)}>
             <Plus className="me-2 h-4 w-4" />
-            Create user
+            {t("createUser")}
           </Button>
         )}
       </div>
@@ -461,7 +464,7 @@ export default function UsersPage() {
               <div className="relative w-full md:max-w-md">
                 <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Search users"
+                  placeholder={t("searchPlaceholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="ps-9"
@@ -473,7 +476,7 @@ export default function UsersPage() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm" className="gap-2">
                       <Filter className="h-4 w-4" />
-                      Filters
+                      {t("filters")}
                       {activeFilterCount > 0 && (
                         <Badge variant="secondary" className="h-5 px-1.5">
                           {activeFilterCount}
@@ -485,14 +488,14 @@ export default function UsersPage() {
                   <DropdownMenuContent align="end" className="w-56">
                     <div className="space-y-2 p-2">
                       <Label className="text-xs text-muted-foreground">
-                        Role
+                        {t("role")}
                       </Label>
                       <Select value={roleFilter} onValueChange={setRoleFilter}>
                         <SelectTrigger className="h-8">
-                          <SelectValue placeholder="All roles" />
+                          <SelectValue placeholder={t("allRoles")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">All roles</SelectItem>
+                          <SelectItem value="all">{t("allRoles")}</SelectItem>
                           {availableRoles.map((role) => (
                             <SelectItem key={role.id} value={role.name}>
                               {role.name}
@@ -506,7 +509,7 @@ export default function UsersPage() {
                       onClick={clearFilters}
                       disabled={activeFilterCount === 0}
                     >
-                      Clear all
+                      {t("clearAll")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -515,7 +518,7 @@ export default function UsersPage() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm" className="gap-2">
                       <Columns3Cog className="h-4 w-4" />
-                      Columns
+                      {t("columns")}
                       <ChevronDown className="h-4 w-4 text-muted-foreground" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -537,9 +540,9 @@ export default function UsersPage() {
 
             {activeFilterCount > 0 && (
               <div className="flex flex-wrap items-center gap-2 text-xs">
-                <span className="text-muted-foreground">Active filters:</span>
+                <span className="text-muted-foreground">{t("activeFilters")}</span>
                 <Badge variant="secondary" className="gap-1">
-                  Role: {roleFilter}
+                  {t("role")}: {roleFilter}
                   <button
                     type="button"
                     onClick={() => setRoleFilter("all")}
@@ -554,7 +557,7 @@ export default function UsersPage() {
             {selectedIds.size > 0 && canDeleteUsers && (
               <div className="flex flex-wrap items-center gap-2 rounded-md border bg-muted/30 p-2">
                 <span className="text-sm font-medium">
-                  {selectedIds.size} user(s) selected
+                  {t("usersSelected", { count: selectedIds.size })}
                 </span>
                 <Button
                   size="sm"
@@ -562,10 +565,10 @@ export default function UsersPage() {
                   onClick={() => setIsBulkDeleteDialogOpen(true)}
                 >
                   <Trash2 className="me-1 h-4 w-4" />
-                  Delete
+                  {t("delete")}
                 </Button>
                 <Button size="sm" variant="ghost" onClick={clearSelection}>
-                  Clear
+                  {t("clear")}
                 </Button>
               </div>
             )}
@@ -589,11 +592,11 @@ export default function UsersPage() {
             ) : filteredUsers.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-4 py-12 text-center">
                 <Shield className="mb-4 h-12 w-12 text-muted-foreground" />
-                <h3 className="mb-2 text-lg font-semibold">No users found</h3>
+                <h3 className="mb-2 text-lg font-semibold">{t("noUsersFound")}</h3>
                 <p className="max-w-md text-sm text-muted-foreground">
                   {searchQuery
-                    ? "Try another search term or clear filters."
-                    : "No users are available yet. Create a new user to get started."}
+                    ? t("tryAnotherSearch")
+                    : t("noUsersDescription")}
                 </p>
                 {!searchQuery && canCreateUsers && (
                   <Button
@@ -601,7 +604,7 @@ export default function UsersPage() {
                     onClick={() => setIsCreateDialogOpen(true)}
                   >
                     <Plus className="me-2 h-4 w-4" />
-                    Create user
+                    {t("createUser")}
                   </Button>
                 )}
               </div>
@@ -730,7 +733,7 @@ export default function UsersPage() {
                                         variant="outline"
                                         className="text-muted-foreground"
                                       >
-                                        No role
+                                        {t("table.noRole")}
                                       </Badge>
                                     )}
                                   </div>
@@ -769,7 +772,7 @@ export default function UsersPage() {
                                         }
                                       >
                                         <Edit className="me-2 h-4 w-4" />
-                                        Edit user
+                                        {t("table.editUser")}
                                       </DropdownMenuItem>
                                     )}
                                     {canAssignRoles && (
@@ -779,7 +782,7 @@ export default function UsersPage() {
                                         }
                                       >
                                         <UserCog className="me-2 h-4 w-4" />
-                                        Manage roles
+                                        {t("table.manageRoles")}
                                       </DropdownMenuItem>
                                     )}
                                     {canDeleteUsers && (
@@ -793,7 +796,7 @@ export default function UsersPage() {
                                           }}
                                         >
                                           <Trash2 className="me-2 h-4 w-4" />
-                                          Delete user
+                                          {t("table.deleteUser")}
                                         </DropdownMenuItem>
                                       </>
                                     )}
@@ -819,7 +822,7 @@ export default function UsersPage() {
               totalItems={totalItems}
               startIndex={startIndex}
               endIndex={endIndex}
-              itemLabel="users"
+              itemLabel={t("title").toLowerCase()}
               onPageChange={setCurrentPage}
               onRowsPerPageChange={(rows) => {
                 setRowsPerPage(rows)
@@ -836,19 +839,18 @@ export default function UsersPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete selected users</AlertDialogTitle>
+            <AlertDialogTitle>{t("dialogs.bulkDelete.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete {selectedIds.size} selected
-              user(s)? This action cannot be undone.
+              {t("dialogs.bulkDelete.description", { count: selectedIds.size })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("dialogs.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
               onClick={handleBulkDeleteUsers}
             >
-              Delete
+              {t("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -857,18 +859,18 @@ export default function UsersPage() {
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create user</DialogTitle>
+            <DialogTitle>{t("dialogs.create.title")}</DialogTitle>
             <DialogDescription>
-              Add a new team member to CVSecurity and assign their initial role.
+              {t("dialogs.create.description")}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreateUser}>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full name</Label>
+                <Label htmlFor="name">{t("dialogs.create.fullName")}</Label>
                 <Input
                   id="name"
-                  placeholder="Enter full name"
+                  placeholder={t("dialogs.create.fullNamePlaceholder")}
                   value={createFormData.name}
                   onChange={(event) =>
                     setCreateFormData({
@@ -880,11 +882,11 @@ export default function UsersPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email address</Label>
+                <Label htmlFor="email">{t("dialogs.create.email")}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter email address"
+                  placeholder={t("dialogs.create.emailPlaceholder")}
                   value={createFormData.email}
                   onChange={(event) =>
                     setCreateFormData({
@@ -896,11 +898,11 @@ export default function UsersPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("dialogs.create.password")}</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Enter password"
+                  placeholder={t("dialogs.create.passwordPlaceholder")}
                   value={createFormData.password}
                   onChange={(event) =>
                     setCreateFormData({
@@ -912,11 +914,11 @@ export default function UsersPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password_confirmation">Confirm password</Label>
+                <Label htmlFor="password_confirmation">{t("dialogs.create.confirmPassword")}</Label>
                 <Input
                   id="password_confirmation"
                   type="password"
-                  placeholder="Confirm password"
+                  placeholder={t("dialogs.create.confirmPassword")}
                   value={createFormData.password_confirmation}
                   onChange={(event) =>
                     setCreateFormData({
@@ -928,7 +930,7 @@ export default function UsersPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="role">Role</Label>
+                <Label htmlFor="role">{t("role")}</Label>
                 <Select
                   value={createFormData.role}
                   onValueChange={(value) =>
@@ -936,7 +938,7 @@ export default function UsersPage() {
                   }
                 >
                   <SelectTrigger id="role">
-                    <SelectValue placeholder="Select role" />
+                    <SelectValue placeholder={t("dialogs.create.selectRole")} />
                   </SelectTrigger>
                   <SelectContent>
                     {availableRoles.map((role) => (
@@ -954,11 +956,11 @@ export default function UsersPage() {
                 variant="outline"
                 onClick={() => setIsCreateDialogOpen(false)}
               >
-                Cancel
+                {t("dialogs.cancel")}
               </Button>
               <Button type="submit" disabled={createUserMutation.isPending}>
                 {createUserMutation.isPending && <Spinner className="me-2" />}
-                Create user
+                {t("createUser")}
               </Button>
             </DialogFooter>
           </form>
@@ -968,18 +970,18 @@ export default function UsersPage() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit user</DialogTitle>
+            <DialogTitle>{t("dialogs.edit.title")}</DialogTitle>
             <DialogDescription>
-              Update the user profile and role settings.
+              {t("dialogs.edit.description")}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleUpdateUser}>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-name">Full name</Label>
+                <Label htmlFor="edit-name">{t("dialogs.create.fullName")}</Label>
                 <Input
                   id="edit-name"
-                  placeholder="Enter full name"
+                  placeholder={t("dialogs.create.fullNamePlaceholder")}
                   value={editFormData.name}
                   onChange={(event) =>
                     setEditFormData({
@@ -991,7 +993,7 @@ export default function UsersPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-role">Role</Label>
+                <Label htmlFor="edit-role">{t("role")}</Label>
                 <Select
                   value={editFormData.role}
                   onValueChange={(value) =>
@@ -999,7 +1001,7 @@ export default function UsersPage() {
                   }
                 >
                   <SelectTrigger id="edit-role">
-                    <SelectValue placeholder="Select role" />
+                    <SelectValue placeholder={t("dialogs.create.selectRole")} />
                   </SelectTrigger>
                   <SelectContent>
                     {availableRoles.map((role) => (
@@ -1011,11 +1013,11 @@ export default function UsersPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-password">New password</Label>
+                <Label htmlFor="edit-password">{t("dialogs.edit.newPassword")}</Label>
                 <Input
                   id="edit-password"
                   type="password"
-                  placeholder="Leave blank to keep existing password"
+                  placeholder={t("dialogs.edit.passwordHelp")}
                   value={editFormData.password}
                   onChange={(event) =>
                     setEditFormData({
@@ -1028,12 +1030,12 @@ export default function UsersPage() {
               {editFormData.password && (
                 <div className="space-y-2">
                   <Label htmlFor="edit-password-confirmation">
-                    Confirm new password
+                    {t("dialogs.edit.confirmNewPassword")}
                   </Label>
                   <Input
                     id="edit-password-confirmation"
                     type="password"
-                    placeholder="Confirm new password"
+                    placeholder={t("dialogs.edit.confirmNewPassword")}
                     value={editFormData.password_confirmation}
                     onChange={(event) =>
                       setEditFormData({
@@ -1051,12 +1053,12 @@ export default function UsersPage() {
                 variant="outline"
                 onClick={() => setIsEditDialogOpen(false)}
               >
-                Cancel
+                {t("dialogs.cancel")}
               </Button>
               <Button type="submit" disabled={updateUserMutation.isPending}>
                 {updateUserMutation.isPending && <Spinner className="me-2" />}
                 <Edit className="me-2 h-4 w-4" />
-                Update user
+                {t("table.editUser")}
               </Button>
             </DialogFooter>
           </form>
@@ -1069,15 +1071,16 @@ export default function UsersPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete user</AlertDialogTitle>
+            <AlertDialogTitle>{t("dialogs.delete.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete{" "}
-              {deletingUser?.name ?? "this user"}?
+              {t("dialogs.delete.description", {
+                name: deletingUser?.name ?? t("title").toLowerCase(),
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setDeletingUser(null)}>
-              Cancel
+              {t("dialogs.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteUser}
@@ -1085,7 +1088,7 @@ export default function UsersPage() {
               className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
             >
               {deleteUserMutation.isPending && <Spinner className="me-2" />}
-              Delete
+              {t("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1097,9 +1100,11 @@ export default function UsersPage() {
       >
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Manage roles</DialogTitle>
+            <DialogTitle>{t("dialogs.manageRoles.title")}</DialogTitle>
             <DialogDescription>
-              Assign roles to {managingUser?.name ?? "the user"}.
+              {t("dialogs.manageRoles.description", {
+                name: managingUser?.name ?? t("title").toLowerCase(),
+              })}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -1110,10 +1115,14 @@ export default function UsersPage() {
                   {managingUser?.email}
                 </div>
               </div>
-              <Badge variant="secondary">{selectedRoles.length} role(s)</Badge>
+              <Badge variant="secondary">
+                {t("dialogs.manageRoles.rolesCount", {
+                  count: selectedRoles.length,
+                })}
+              </Badge>
             </div>
             <div className="space-y-2">
-              <Label>Available roles</Label>
+              <Label>{t("dialogs.manageRoles.availableRoles")}</Label>
               <ScrollArea className="h-72 rounded-md border">
                 <div className="space-y-4 p-4">
                   {availableRoles.map((role) => (
@@ -1135,7 +1144,9 @@ export default function UsersPage() {
                         </Label>
                         {role.permissions && role.permissions.length > 0 && (
                           <p className="text-xs text-muted-foreground">
-                            {role.permissions.length} permission(s)
+                            {t("dialogs.manageRoles.permissions", {
+                              count: role.permissions.length,
+                            })}
                           </p>
                         )}
                       </div>
@@ -1160,7 +1171,7 @@ export default function UsersPage() {
                 setSelectedRoles([])
               }}
             >
-              Cancel
+              {t("dialogs.cancel")}
             </Button>
             <Button
               onClick={handleSaveRoles}
@@ -1168,7 +1179,7 @@ export default function UsersPage() {
             >
               {assignRolesMutation.isPending && <Spinner className="me-2" />}
               <UserCog className="me-2 h-4 w-4" />
-              Save roles
+              {t("dialogs.manageRoles.saveRoles")}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -341,14 +341,13 @@
     "changeStatus": "تغيير الحالة",
     "activate": "تفعيل",
     "deactivate": "تعطيل",
-    "delete": "حذف",
-    "deleteTitle": "حذف الغرفة؟",
-    "deleteDescription": "هل أنت متأكد أنك تريد حذف \"{name}\"؟ لا يمكن التراجع عن هذا الإجراء.",
     "delete": {
       "aboutToDelete": "أنت على وشك حذف:",
       "bulkTitle": "حذف {count} {count, plural, one {غرفة} other {غرف}}؟",
       "bulkDescription": "سيتم حذف {count} {count, plural, one {غرفة مختارة} other {غرف مختارة}} بشكل دائم. لا يمكن التراجع عن هذا الإجراء."
     },
+    "deleteTitle": "حذف الغرفة؟",
+    "deleteDescription": "هل أنت متأكد أنك تريد حذف \"{name}\"؟ لا يمكن التراجع عن هذا الإجراء.",
     "table": {
       "name": "الاسم",
       "location": "الموقع",
@@ -548,7 +547,86 @@
       "activate": "تنشيط",
       "deactivate": "إلغاء التنشيط"
     }
+  },
+  "users": {
+    "title": "المستخدمين",
+    "description": "إدارة حسابات المستخدمين والأدوار والوصول لنظام CVSecurity.",
+    "createUser": "إنشاء مستخدم",
+    "searchPlaceholder": "البحث عن مستخدمين",
+    "filters": "التصنيفات",
+    "allRoles": "جميع الأدوار",
+    "role": "الدور",
+    "clearAll": "مسح الكل",
+    "columns": "الأعمدة",
+    "activeFilters": "التصنيفات النشطة:",
+    "usersSelected": "{count, plural, zero {لم يتم اختيار مستخدمين} one {تم اختيار مستخدم واحد} two {تم اختيار مستخدمين} few {تم اختيار {count} مستخدمين} many {تم اختيار {count} مستخدماً} other {تم اختيار {count} مستخدم}}",
+    "delete": "حذف",
+    "clear": "مسح",
+    "noUsersFound": "لم يتم العثور على مستخدمين",
+    "noUsersDescription": "لا يوجد مستخدمون متاحون بعد. أنشئ مستخدماً جديداً للبدء.",
+    "tryAnotherSearch": "حاول استخدام مصطلح بحث آخر أو امسح التصنيفات.",
+    "table": {
+      "user": "المستخدم",
+      "email": "البريد الإلكتروني",
+      "roles": "الأدوار",
+      "joined": "تاريخ الانضمام",
+      "actions": "الإجراءات",
+      "noRole": "بدون دور",
+      "editUser": "تعديل المستخدم",
+      "manageRoles": "إدارة الأدوار",
+      "deleteUser": "حذف المستخدم"
+    },
+    "dialogs": {
+      "bulkDelete": {
+        "title": "حذف المستخدمين المختارين",
+        "description": "هل أنت متأكد أنك تريد حذف {count} {count, plural, one {مستخدم مختار} other {مستخدمين مختارين}}؟ لا يمكن التراجع عن هذا الإجراء."
+      },
+      "create": {
+        "title": "إنشاء مستخدم",
+        "description": "أضف عضو فريق جديد إلى CVSecurity وعين دوره الأولي.",
+        "fullName": "الاسم الكامل",
+        "fullNamePlaceholder": "أدخل الاسم الكامل",
+        "email": "البريد الإلكتروني",
+        "emailPlaceholder": "أدخل البريد الإلكتروني",
+        "password": "كلمة المرور",
+        "passwordPlaceholder": "أدخل كلمة المرور",
+        "confirmPassword": "تأكيد كلمة المرور",
+        "selectRole": "اختر الدور",
+        "success": "تم إنشاء المستخدم بنجاح.",
+        "error": "فشل إنشاء المستخدم."
+      },
+      "edit": {
+        "title": "تعديل المستخدم",
+        "description": "تحديث الملف الشخصي للمستخدم وإعدادات الدور.",
+        "newPassword": "كلمة مرور جديدة",
+        "passwordHelp": "اتركه فارغاً للحفاظ على كلمة المرور الحالية",
+        "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+        "success": "تم تحديث المستخدم بنجاح.",
+        "error": "فشل تحديث المستخدم."
+      },
+      "delete": {
+        "title": "حذف المستخدم",
+        "description": "هل أنت متأكد أنك تريد حذف {name}؟",
+        "success": "تم حذف المستخدم بنجاح.",
+        "error": "فشل حذف المستخدم."
+      },
+      "manageRoles": {
+        "title": "إدارة الأدوار",
+        "description": "تعيين الأدوار لـ {name}.",
+        "availableRoles": "الأدوار المتاحة",
+        "permissions": "{count, plural, one {صلاحية واحدة} two {صلاحيتان} few {# صلاحيات} many {# صلاحية} other {# صلاحية}}",
+        "rolesCount": "{count, plural, one {دور واحد} two {دوران} few {# أدوار} many {# دوراً} other {# دور}}",
+        "saveRoles": "حفظ الأدوار",
+        "success": "تم تحديث الأدوار بنجاح.",
+        "error": "فشل تحديث الأدوار."
+      },
+      "cancel": "إلغاء"
+    },
+    "messages": {
+      "nameEmailRequired": "الاسم والبريد الإلكتروني مطلوبان.",
+      "nameRequired": "الاسم مطلوب.",
+      "passwordsDontMatch": "كلمات المرور غير متطابقة.",
+      "bulkDeleteSuccess": "تم حذف المستخدمين المختارين بنجاح."
+    }
   }
 }
-
-

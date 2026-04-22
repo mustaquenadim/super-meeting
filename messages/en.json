@@ -550,7 +550,86 @@
       "activate": "Activate",
       "deactivate": "Deactivate"
     }
+  },
+  "users": {
+    "title": "Users",
+    "description": "Manage user accounts, roles, and access for the CVSecurity system.",
+    "createUser": "Create user",
+    "searchPlaceholder": "Search users",
+    "filters": "Filters",
+    "allRoles": "All roles",
+    "role": "Role",
+    "clearAll": "Clear all",
+    "columns": "Columns",
+    "activeFilters": "Active filters:",
+    "usersSelected": "{count, plural, one {1 user selected} other {# users selected}}",
+    "delete": "Delete",
+    "clear": "Clear",
+    "noUsersFound": "No users found",
+    "noUsersDescription": "No users are available yet. Create a new user to get started.",
+    "tryAnotherSearch": "Try another search term or clear filters.",
+    "table": {
+      "user": "User",
+      "email": "Email",
+      "roles": "Roles",
+      "joined": "Joined",
+      "actions": "Actions",
+      "noRole": "No role",
+      "editUser": "Edit user",
+      "manageRoles": "Manage roles",
+      "deleteUser": "Delete user"
+    },
+    "dialogs": {
+      "bulkDelete": {
+        "title": "Delete selected users",
+        "description": "Are you sure you want to delete {count} selected {count, plural, one {user} other {users}}? This action cannot be undone."
+      },
+      "create": {
+        "title": "Create user",
+        "description": "Add a new team member to CVSecurity and assign their initial role.",
+        "fullName": "Full name",
+        "fullNamePlaceholder": "Enter full name",
+        "email": "Email address",
+        "emailPlaceholder": "Enter email address",
+        "password": "Password",
+        "passwordPlaceholder": "Enter password",
+        "confirmPassword": "Confirm password",
+        "selectRole": "Select role",
+        "success": "User created successfully.",
+        "error": "Failed to create user."
+      },
+      "edit": {
+        "title": "Edit user",
+        "description": "Update the user profile and role settings.",
+        "newPassword": "New password",
+        "passwordHelp": "Leave blank to keep existing password",
+        "confirmNewPassword": "Confirm new password",
+        "success": "User updated successfully.",
+        "error": "Failed to update user."
+      },
+      "delete": {
+        "title": "Delete user",
+        "description": "Are you sure you want to delete {name}?",
+        "success": "User deleted successfully.",
+        "error": "Failed to delete user."
+      },
+      "manageRoles": {
+        "title": "Manage roles",
+        "description": "Assign roles to {name}.",
+        "availableRoles": "Available roles",
+        "permissions": "{count, plural, one {1 permission} other {# permissions}}",
+        "rolesCount": "{count, plural, one {1 role} other {# roles}}",
+        "saveRoles": "Save roles",
+        "success": "Roles updated successfully.",
+        "error": "Failed to update roles."
+      },
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "nameEmailRequired": "Name and email are required.",
+      "nameRequired": "Name is required.",
+      "passwordsDontMatch": "Passwords do not match.",
+      "bulkDeleteSuccess": "Selected users deleted successfully."
+    }
   }
 }
-
-
