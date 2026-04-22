@@ -33,6 +33,7 @@ import {
   XCircle,
   X,
 } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -154,116 +155,30 @@ function getCouponSortVal(coupon: Coupon, col: CouponColumnKey): string {
   }
 }
 
-const t = (key: string, values?: Record<string, string | number>) => {
-  if (key === "minimumAmount" && values?.amount !== undefined)
-    return `Min: $${values.amount}`
-  if (key === "toolbar.selectedCount" && values?.count !== undefined)
-    return `${values.count} selected`
-
-  const dict: Record<string, string> = {
-    title: "Promo Codes",
-    description: "Create and manage booking coupons.",
-    createCoupon: "Create Coupon",
-    couponCreated: "Coupon created successfully.",
-    couponUpdated: "Coupon updated successfully.",
-    couponDeleted: "Coupon deleted successfully.",
-    failedCreate: "Failed to create coupon.",
-    failedUpdate: "Failed to update coupon.",
-    failedDelete: "Failed to delete coupon.",
-    failedStatusUpdate: "Failed to update coupon status.",
-    couponActivated: "Coupon activated.",
-    couponDeactivated: "Coupon deactivated.",
-    expired: "Expired",
-    code: "Code",
-    discount: "Discount",
-    usage: "Usage",
-    validPeriod: "Valid Period",
-    viewDetails: "View Details",
-    copyCode: "Copy Code",
-    deactivate: "Deactivate",
-    activate: "Activate",
-    totalCoupons: "Total Coupons",
-    allTimeCreated: "All time created",
-    activeCoupons: "Active Coupons",
-    currentlyAvailable: "Currently available",
-    totalUsage: "Total Usage",
-    timesRedeemed: "Times redeemed",
-    noLongerValid: "No longer valid",
-    searchCoupons: "Search coupons...",
-    filterByStatus: "Filter by status",
-    allStatus: "All Status",
-    noCouponsFound: "No coupons found",
-    deleteCoupon: "Delete Coupon",
-    deleteCouponDescription: "This action cannot be undone.",
-    createNewCoupon: "Create New Coupon",
-    createNewCouponDescription: "Add a new promotional coupon.",
-    couponCode: "Coupon Code",
-    couponCodePlaceholder: "SUMMER2026",
-    discountDescription: "Description",
-    descriptionPlaceholder: "Optional description",
-    discountType: "Discount Type",
-    percentageLabel: "Percentage",
-    fixedAmountLabel: "Fixed Amount",
-    discountValue: "Discount Value",
-    minimumBookingAmount: "Minimum Booking Amount",
-    maximumDiscount: "Maximum Discount",
-    zero: "0",
-    noLimitPlaceholder: "No limit",
-    validFrom: "Valid From",
-    validUntil: "Valid Until",
-    usageLimit: "Usage Limit",
-    unlimitedPlaceholder: "Unlimited",
-    applicableRooms: "Applicable Rooms",
-    allRooms: "All Rooms",
-    conferenceRooms: "Conference Rooms",
-    meetingRooms: "Meeting Rooms",
-    boardrooms: "Boardrooms",
-    trainingRooms: "Training Rooms",
-    focusRooms: "Focus Rooms",
-    editCoupon: "Edit Coupon",
-    editCouponDescription: "Update coupon details.",
-    saveChanges: "Save Changes",
-    couponDetails: "Coupon Details",
-    couponDetailsDescription: "Detailed coupon information.",
-    minimumBooking: "Minimum Booking",
-    maximumDiscountShort: "Max Discount",
-    noLimit: "No limit",
-    close: "Close",
-    aboutToDeleteCoupon: "You are about to delete:",
-    "table.aria.selectAllRows": "Select all rows",
-    "table.aria.selectRow": "Select row",
-    "table.itemLabel": "coupons",
-  }
-
-  return dict[key] ?? key
-}
-
-const getApplicableRoomsLabel = (value: string) => {
-  const map: Record<string, string> = {
-    all: "All Rooms",
-    conference: "Conference Rooms",
-    meeting: "Meeting Rooms",
-    boardroom: "Boardrooms",
-    training: "Training Rooms",
-    focus: "Focus Rooms",
-  }
-  return map[value] ?? value.charAt(0).toUpperCase() + value.slice(1)
-}
-
-const tCommon = (key: string) => {
-  const dict: Record<string, string> = {
-    status: "Status",
-    actions: "Actions",
-    active: "Active",
-    inactive: "Inactive",
-    edit: "Edit",
-    delete: "Delete",
-    cancel: "Cancel",
-  }
-  return dict[key] ?? key
-}
 
 export default function CouponsPage() {
+  const t = useTranslations("promoCodes")
+  const tCommon = useTranslations("rooms.common")
+
+  const getApplicableRoomsLabel = (value: string) => {
+    switch (value) {
+      case "all":
+        return t("allRooms")
+      case "conference":
+        return t("conferenceRooms")
+      case "meeting":
+        return t("meetingRooms")
+      case "boardroom":
+        return t("boardrooms")
+      case "training":
+        return t("trainingRooms")
+      case "focus":
+        return t("focusRooms")
+      default:
+        return value.charAt(0).toUpperCase() + value.slice(1)
+    }
+  }
+
   const { data: couponsData, isLoading: couponsLoading } = useCoupons(1, 200)
   const createCoupon = useCreateCoupon()
   const updateCoupon = useUpdateCoupon()
@@ -496,7 +411,7 @@ export default function CouponsPage() {
         hideable: false,
       },
     }),
-    []
+    [t, tCommon]
   )
 
   const {

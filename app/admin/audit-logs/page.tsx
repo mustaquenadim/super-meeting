@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Activity, Pause, Play, Radio } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +31,7 @@ const POLL_MS = 10_000;
 const MAX_ROWS = 500;
 
 export default function AuditLogsPage() {
+  const t = useTranslations("auditLogs");
   const {
     events,
     isLoading,
@@ -44,11 +46,12 @@ export default function AuditLogsPage() {
     <div className="flex min-w-0 flex-1 flex-col gap-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Audit logs</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
           <p className="text-muted-foreground text-sm">
-            Live access events from CVSecurity (
-            <code className="text-xs">/api/transaction/monitor</code>). Polling
-            every {POLL_MS / 1000}s per platform guidance.
+            {t("description", {
+              endpoint: "/api/transaction/monitor",
+              interval: POLL_MS / 1000,
+            })}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -59,7 +62,7 @@ export default function AuditLogsPage() {
               onCheckedChange={(on) => setPaused(!on)}
             />
             <Label htmlFor="audit-pause" className="text-sm">
-              Live updates
+              {t("liveUpdates")}
             </Label>
           </div>
           <Button
@@ -71,12 +74,12 @@ export default function AuditLogsPage() {
             {isPaused ? (
               <>
                 <Play className="size-3.5" />
-                Resume
+                {t("resume")}
               </>
             ) : (
               <>
                 <Pause className="size-3.5" />
-                Pause
+                {t("pause")}
               </>
             )}
           </Button>
@@ -88,31 +91,34 @@ export default function AuditLogsPage() {
           <div className="space-y-1">
             <CardTitle className="flex items-center gap-2 text-lg">
               <Radio className="size-4 text-muted-foreground" />
-              CVSecurity stream
+              {t("streamTitle")}
             </CardTitle>
             <CardDescription>
               {lastUpdatedAt
-                ? `Last poll: ${lastUpdatedAt.toLocaleTimeString()} (${pollCount} polls)`
+                ? t("lastPoll", {
+                    time: lastUpdatedAt.toLocaleTimeString(),
+                    count: pollCount,
+                  })
                 : isLoading
-                  ? "Connecting…"
-                  : "Waiting for first response"}
+                  ? t("connecting")
+                  : t("waiting")}
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
             {isLoading && events.length === 0 ? (
               <Badge variant="secondary" className="gap-1">
                 <Activity className="size-3 animate-pulse" />
-                Loading
+                {t("loading")}
               </Badge>
             ) : isPaused ? (
-              <Badge variant="outline">Paused</Badge>
+              <Badge variant="outline">{t("paused")}</Badge>
             ) : (
               <Badge className="gap-1 bg-emerald-600 hover:bg-emerald-600/90">
                 <span className="relative flex size-2">
                   <span className="absolute inline-flex size-full animate-ping rounded-full bg-white/60 opacity-75" />
                   <span className="relative inline-flex size-2 rounded-full bg-white" />
                 </span>
-                Live
+                {t("live")}
               </Badge>
             )}
           </div>
@@ -122,20 +128,27 @@ export default function AuditLogsPage() {
             <p className="text-destructive text-sm">{error}</p>
           ) : events.length === 0 && !isLoading ? (
             <p className="text-muted-foreground text-sm">
-              No events in this window yet. Trigger a door reader or check
-              CVSecurity connectivity.
+              {t("noEvents")}
             </p>
           ) : (
             <ScrollArea className="h-[min(70vh,640px)] rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[140px]">Time</TableHead>
-                    <TableHead>Event</TableHead>
-                    <TableHead className="hidden md:table-cell">Person</TableHead>
-                    <TableHead className="hidden lg:table-cell">Area</TableHead>
-                    <TableHead className="hidden xl:table-cell">Reader</TableHead>
-                    <TableHead className="hidden sm:table-cell">Device</TableHead>
+                    <TableHead className="w-[140px]">{t("table.time")}</TableHead>
+                    <TableHead>{t("table.event")}</TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      {t("table.person")}
+                    </TableHead>
+                    <TableHead className="hidden lg:table-cell">
+                      {t("table.area")}
+                    </TableHead>
+                    <TableHead className="hidden xl:table-cell">
+                      {t("table.reader")}
+                    </TableHead>
+                    <TableHead className="hidden sm:table-cell">
+                      {t("table.device")}
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
