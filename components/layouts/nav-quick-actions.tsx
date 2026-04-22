@@ -9,6 +9,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { Link } from "@/i18n/navigation"
+import { useTranslations } from "next-intl"
 
 export function NavQuickActions({
   actions,
@@ -19,17 +21,19 @@ export function NavQuickActions({
     icon: React.ReactNode
   }[]
 }) {
+  const t = useTranslations("sidebar.group")
+
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Quick Actions</SidebarGroupLabel>
+      <SidebarGroupLabel>{t("quickActions")}</SidebarGroupLabel>
       <SidebarMenu>
         {actions.map((action) => (
-          <SidebarMenuItem key={action.name}>
+          <SidebarMenuItem key={action.url}>
             <SidebarMenuButton asChild tooltip={action.name}>
-              <a href={action.url}>
+              <Link href={action.url}>
                 {action.icon}
                 <span>{action.name}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}

@@ -1,8 +1,6 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -19,16 +17,24 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { Link, useRouter } from "@/i18n/navigation"
+import { AppLocale } from "@/i18n/routing"
+import { LOCALE_COOKIE } from "@/lib/auth/cookies"
 import { supabase } from "@/lib/supabase"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useLocale, useTranslations } from "next-intl"
 import {
   BadgeCheckIcon,
+  CheckIcon,
   ChevronsUpDownIcon,
+  LanguagesIcon,
   LogOutIcon,
   UserIcon,
 } from "lucide-react"
 
 export function NavUser() {
+  const t = useTranslations("sidebar.userMenu")
+  const locale = useLocale() as AppLocale
   const router = useRouter()
   const { isMobile } = useSidebar()
   const queryClient = useQueryClient()
@@ -81,6 +87,14 @@ export function NavUser() {
 
     queryClient.setQueryData(["auth-user"], null)
     router.replace("/auth/login")
+  }
+
+  const handleLocaleChange = (nextLocale: AppLocale) => {
+    if (nextLocale === locale) return
+
+    const secure = window.location.protocol === "https:" ? "; Secure" : ""
+    document.cookie = `${LOCALE_COOKIE}=${nextLocale}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax${secure}`
+    router.refresh()
   }
 
   if (isLoading || !user) {
@@ -143,8 +157,34 @@ export function NavUser() {
               <DropdownMenuItem asChild>
                 <Link href="/admin/profile">
                   <BadgeCheckIcon />
-                  Profile
+                  {t("profile")}
                 </Link>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs text-muted-foreground">
+              {t("language")}
+            </DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                onSelect={(event) => {
+                  event.preventDefault()
+                  handleLocaleChange("en")
+                }}
+              >
+                <LanguagesIcon />
+                {t("languageEn")}
+                {locale === "en" && <CheckIcon className="ms-auto size-4" />}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={(event) => {
+                  event.preventDefault()
+                  handleLocaleChange("ar")
+                }}
+              >
+                <LanguagesIcon />
+                {t("languageAr")}
+                {locale === "ar" && <CheckIcon className="ms-auto size-4" />}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
@@ -155,7 +195,7 @@ export function NavUser() {
                 onClick={handleLogout}
               >
                 <LogOutIcon />
-                Log out
+                {t("logout")}
               </button>
             </DropdownMenuItem>
           </DropdownMenuContent>

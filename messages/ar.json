@@ -1,0 +1,33 @@
+{
+  "sidebar": {
+    "logoAlt": "شعار سوبر أوفيس",
+    "group": {
+      "platform": "المنصة",
+      "quickActions": "إجراءات سريعة"
+    },
+    "nav": {
+      "dashboard": "لوحة التحكم",
+      "locations": "المواقع",
+      "rooms": "الغرف",
+      "roomsAll": "كل الغرف",
+      "roomsCategories": "فئات الغرف",
+      "roomsAmenities": "مرافق الغرف",
+      "bookings": "الحجوزات",
+      "users": "المستخدمون",
+      "promoCodes": "أكواد الخصم",
+      "auditLogs": "سجلات التدقيق",
+      "settings": "الإعدادات",
+      "settingsGeneral": "عام"
+    },
+    "quickActions": {
+      "newBooking": "حجز جديد"
+    },
+    "userMenu": {
+      "profile": "الملف الشخصي",
+      "logout": "تسجيل الخروج",
+      "language": "اللغة",
+      "languageEn": "الإنجليزية",
+      "languageAr": "العربية"
+    }
+  }
+}

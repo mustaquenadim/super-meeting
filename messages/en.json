@@ -1,0 +1,33 @@
+{
+  "sidebar": {
+    "logoAlt": "Super Office Logo",
+    "group": {
+      "platform": "Platform",
+      "quickActions": "Quick Actions"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "locations": "Locations",
+      "rooms": "Rooms",
+      "roomsAll": "All Rooms",
+      "roomsCategories": "Room Categories",
+      "roomsAmenities": "Room Amenities",
+      "bookings": "Bookings",
+      "users": "Users",
+      "promoCodes": "Promo Codes",
+      "auditLogs": "Audit Logs",
+      "settings": "Settings",
+      "settingsGeneral": "General"
+    },
+    "quickActions": {
+      "newBooking": "New Booking"
+    },
+    "userMenu": {
+      "profile": "Profile",
+      "logout": "Log out",
+      "language": "Language",
+      "languageEn": "English",
+      "languageAr": "Arabic"
+    }
+  }
+}

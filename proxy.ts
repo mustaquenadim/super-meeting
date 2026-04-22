@@ -75,6 +75,7 @@ export async function proxy(request: NextRequest) {
 
   const loginUrl = new URL("/auth/login", request.url)
   loginUrl.searchParams.set("next", pathname)
+
   return NextResponse.redirect(loginUrl)
 }
 

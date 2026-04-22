@@ -26,85 +26,86 @@ import {
 import { NavQuickActions } from "@/components/layouts/nav-quick-actions"
 import Image from "next/image"
 import { useTheme } from "next-themes"
-
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/admin/dashboard",
-      icon: <LayoutDashboardIcon />,
-      isActive: true,
-    },
-    {
-      title: "Locations",
-      url: "/admin/locations",
-      icon: <MapPinIcon />,
-    },
-    {
-      title: "Rooms",
-      url: "/admin/rooms",
-      icon: <DoorOpenIcon />,
-      items: [
-        { title: "All Rooms", url: "/admin/rooms" },
-        { title: "Room Categories", url: "/admin/rooms/categories" },
-        { title: "Room Amenities", url: "/admin/rooms/amenities" },
-      ],
-    },
-    {
-      title: "Bookings",
-      url: "/admin/bookings",
-      icon: <CalendarDaysIcon />,
-    },
-    // {
-    //   title: "Bookings",
-    //   url: "/admin/bookings",
-    //   icon: <CalendarDaysIcon />,
-    //   items: [
-    //     { title: "All Bookings", url: "/admin/bookings" },
-    //     { title: "Calendar View", url: "/admin/bookings/calendar" },
-    //     { title: "New Booking", url: "/admin/bookings/new" },
-    //   ],
-    // },
-    {
-      title: "Users",
-      url: "/admin/users",
-      icon: <UserCogIcon />,
-    },
-    {
-      title: "Promo Codes",
-      url: "/admin/promo-codes",
-      icon: <TagIcon />,
-    },
-    {
-      title: "Audit Logs",
-      url: "/admin/audit-logs",
-      icon: <ClipboardListIcon />,
-    },
-    {
-      title: "Settings",
-      url: "/admin/settings",
-      icon: <Settings2Icon />,
-      items: [{ title: "General", url: "/admin/settings/general" }],
-    },
-  ],
-  quickActions: [
-    {
-      name: "New Booking",
-      url: "/admin/bookings/new",
-      icon: <PlusCircleIcon />,
-    },
-  ],
-}
+import { useLocale, useTranslations } from "next-intl"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const t = useTranslations("sidebar")
+  const locale = useLocale()
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
+  const side = locale === "ar" ? "right" : "left"
+
+  const navMain = React.useMemo(
+    () => [
+      {
+        title: t("nav.dashboard"),
+        url: "/admin/dashboard",
+        icon: <LayoutDashboardIcon />,
+        isActive: true,
+      },
+      {
+        title: t("nav.locations"),
+        url: "/admin/locations",
+        icon: <MapPinIcon />,
+      },
+      {
+        title: t("nav.rooms"),
+        url: "/admin/rooms",
+        icon: <DoorOpenIcon />,
+        items: [
+          { title: t("nav.roomsAll"), url: "/admin/rooms" },
+          {
+            title: t("nav.roomsCategories"),
+            url: "/admin/rooms/categories",
+          },
+          {
+            title: t("nav.roomsAmenities"),
+            url: "/admin/rooms/amenities",
+          },
+        ],
+      },
+      {
+        title: t("nav.bookings"),
+        url: "/admin/bookings",
+        icon: <CalendarDaysIcon />,
+      },
+      {
+        title: t("nav.users"),
+        url: "/admin/users",
+        icon: <UserCogIcon />,
+      },
+      {
+        title: t("nav.promoCodes"),
+        url: "/admin/promo-codes",
+        icon: <TagIcon />,
+      },
+      {
+        title: t("nav.auditLogs"),
+        url: "/admin/audit-logs",
+        icon: <ClipboardListIcon />,
+      },
+      {
+        title: t("nav.settings"),
+        url: "/admin/settings",
+        icon: <Settings2Icon />,
+        items: [
+          { title: t("nav.settingsGeneral"), url: "/admin/settings/general" },
+        ],
+      },
+    ],
+    [t]
+  )
+
+  const quickActions = React.useMemo(
+    () => [
+      {
+        name: t("quickActions.newBooking"),
+        url: "/admin/bookings/new",
+        icon: <PlusCircleIcon />,
+      },
+    ],
+    [t]
+  )
 
   React.useEffect(() => {
     setMounted(true)
@@ -116,7 +117,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       : "/brand/logo-light.png"
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar side={side} collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenuButton
           size="lg"
@@ -126,7 +127,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <div className="absolute inset-0 group-data-[collapsible=icon]:hidden">
               <Image
                 src={expandedLogoSrc}
-                alt="Super Office Logo"
+                alt={t("logoAlt")}
                 fill
                 className="rounded-md object-contain"
               />
@@ -134,7 +135,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <div className="absolute inset-0 hidden items-center justify-center group-data-[collapsible=icon]:flex">
               <Image
                 src="/brand/logo-icon.png"
-                alt="Super Office Logo"
+                alt={t("logoAlt")}
                 width={24}
                 height={24}
                 className="rounded-md object-contain"
@@ -144,8 +145,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenuButton>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavQuickActions actions={data.quickActions} />
+        <NavMain items={navMain} />
+        <NavQuickActions actions={quickActions} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

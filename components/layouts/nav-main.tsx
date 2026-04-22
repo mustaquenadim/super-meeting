@@ -17,8 +17,9 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import { Link } from "@/i18n/navigation"
 import { ChevronRightIcon } from "lucide-react"
-import Link from "next/link"
+import { useTranslations } from "next-intl"
 
 export function NavMain({
   items,
@@ -34,13 +35,15 @@ export function NavMain({
     }[]
   }[]
 }) {
+  const t = useTranslations("sidebar.group")
+
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>{t("platform")}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) =>
           item.items && item.items.length > 0 ? (
-            <SidebarMenuItem key={item.title}>
+            <SidebarMenuItem key={item.url}>
               <Collapsible
                 defaultOpen={item.isActive}
                 className="group/collapsible"
@@ -55,7 +58,7 @@ export function NavMain({
                 <CollapsibleContent>
                   <SidebarMenuSub>
                     {item.items.map((subItem) => (
-                      <SidebarMenuSubItem key={subItem.title}>
+                      <SidebarMenuSubItem key={subItem.url}>
                         <SidebarMenuSubButton asChild>
                           <Link href={subItem.url}>
                             <span>{subItem.title}</span>
@@ -68,7 +71,7 @@ export function NavMain({
               </Collapsible>
             </SidebarMenuItem>
           ) : (
-            <SidebarMenuItem key={item.title}>
+            <SidebarMenuItem key={item.url}>
               <SidebarMenuButton asChild>
                 <Link href={item.url}>
                   {item.icon}
