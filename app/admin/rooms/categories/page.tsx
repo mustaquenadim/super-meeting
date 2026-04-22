@@ -463,7 +463,7 @@ export default function RoomCategoriesPage() {
               <div className="relative max-w-sm flex-1">
                 <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Search categories..."
+                  placeholder={t("toolbar.searchPlaceholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
@@ -475,7 +475,7 @@ export default function RoomCategoriesPage() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
                       <Filter className="h-4 w-4" />
-                      <span className="hidden lg:inline">Filters</span>
+                      <span className="hidden lg:inline">{tCommon("filters")}</span>
                       {activeFilterCount > 0 && (
                         <Badge
                           variant="default"
@@ -493,7 +493,7 @@ export default function RoomCategoriesPage() {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center justify-between">
-                        <h3 className="font-semibold">Filters</h3>
+                        <h3 className="font-semibold">{tCommon("filters")}</h3>
                         {activeFilterCount > 0 && (
                           <Button
                             variant="ghost"
@@ -505,7 +505,7 @@ export default function RoomCategoriesPage() {
                             className="h-7 text-xs"
                           >
                             <X className="mr-1 h-3 w-3" />
-                            Clear All
+                            {tCommon("clearAll")}
                           </Button>
                         )}
                       </div>
@@ -544,10 +544,8 @@ export default function RoomCategoriesPage() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
                       <Columns3Cog className="h-4 w-4" />
-                      <span className="hidden lg:inline">
-                        Customize Columns
-                      </span>
-                      <span className="lg:hidden">Columns</span>
+                        {tCommon("customizeColumns")}
+                      <span className="lg:hidden">{tCommon("columns")}</span>
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -927,7 +925,7 @@ export default function RoomCategoriesPage() {
                 >
                   {tCommon("cancel")}
                 </Button>
-                <Button type="submit">{t("buttons.updateCategory")}</Button>
+                <Button type="submit">{t("buttons.update")}</Button>
               </DialogFooter>
             </FieldGroup>
           </form>
@@ -947,7 +945,7 @@ export default function RoomCategoriesPage() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <div className="text-sm font-medium text-muted-foreground">
-                  {t("table.categoryName")}
+                  {t("table.name")}
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-base font-semibold">
@@ -1010,7 +1008,7 @@ export default function RoomCategoriesPage() {
                     handleEdit(selectedCategory)
                   }}
                 >
-                  {t("buttons.editCategory")}
+                  {t("buttons.edit")}
                 </Button>
               </DialogFooter>
             </div>

@@ -643,9 +643,9 @@ export default function RoomAmenitiesPage() {
                     <Button variant="outline" size="sm">
                       <Columns3Cog className="h-4 w-4" />
                       <span className="hidden lg:inline">
-                        {t("toolbar.customizeColumns")}
+                        {tCommon("customizeColumns")}
                       </span>
-                      <span className="lg:hidden">{t("toolbar.columns")}</span>
+                      <span className="lg:hidden">{tCommon("columns")}</span>
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -669,7 +669,7 @@ export default function RoomAmenitiesPage() {
             {activeFilterCount > 0 && (
               <div className="flex min-w-0 flex-wrap items-center gap-2">
                 <span className="text-xs text-muted-foreground">
-                  {t("toolbar.activeFilters")}
+                  {tCommon("activeFilters")}
                 </span>
                 {statusFilter !== "all" && (
                   <Badge variant="secondary" className="text-xs">
@@ -699,7 +699,7 @@ export default function RoomAmenitiesPage() {
                   onClick={clearSelection}
                   className="text-xs text-muted-foreground hover:text-foreground"
                 >
-                  {t("toolbar.clear")}
+                  {tCommon("clear")}
                 </button>
               </div>
               <div className="flex items-center gap-2">
@@ -707,7 +707,7 @@ export default function RoomAmenitiesPage() {
                   <DropdownMenuTrigger>
                     <Button variant="outline" size="sm">
                       <CheckCircle2 className="mr-2 h-4 w-4" />
-                      {t("toolbar.changeStatus")}
+                      {tCommon("changeStatus")}
                       <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -716,14 +716,14 @@ export default function RoomAmenitiesPage() {
                       onClick={() => handleBulkStatusChange("active")}
                     >
                       <CheckCircle2 className="mr-2 h-4 w-4 text-green-600" />
-                      {t("toolbar.activate")}
+                      {tCommon("activate")}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => handleBulkStatusChange("inactive")}
                     >
                       <XCircle className="mr-2 h-4 w-4 text-muted-foreground" />
-                      {t("toolbar.deactivate")}
+                      {tCommon("deactivate")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -1109,7 +1109,7 @@ export default function RoomAmenitiesPage() {
                 >
                   {tCommon("cancel")}
                 </Button>
-                <Button type="submit">{t("buttons.updateEquipment")}</Button>
+                <Button type="submit">{t("buttons.update")}</Button>
               </DialogFooter>
             </FieldGroup>
           </form>
@@ -1192,7 +1192,7 @@ export default function RoomAmenitiesPage() {
                     handleEdit(selectedEquipment)
                   }}
                 >
-                  {t("buttons.editEquipment")}
+                  {t("buttons.edit")}
                 </Button>
               </DialogFooter>
             </div>

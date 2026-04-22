@@ -180,6 +180,16 @@
       "title": "Room Amenities",
       "description": "Manage room amenities and equipment.",
       "addAmenity": "Add Amenity",
+      "toolbar": {
+        "searchPlaceholder": "Search amenities..."
+      },
+      "form": {
+        "equipmentName": "Equipment Name",
+        "enterEquipmentName": "Enter equipment name",
+        "description": "Description",
+        "enterEquipmentDescription": "Enter description",
+        "selectType": "Select type"
+      },
       "table": {
         "equipment": "Equipment",
         "type": "Type",
@@ -240,6 +250,15 @@
       "title": "Room Categories",
       "description": "Manage room categories for organizing your spaces.",
       "addCategory": "Add Category",
+      "toolbar": {
+        "searchPlaceholder": "Search categories..."
+      },
+      "form": {
+        "categoryName": "Category Name",
+        "enterCategoryName": "Enter category name",
+        "description": "Description",
+        "enterCategoryDescription": "Enter description"
+      },
       "table": {
         "name": "Category Name",
         "description": "Description",
@@ -295,7 +314,16 @@
       "cancel": "Cancel",
       "actions": "Actions",
       "noResults": "No results found.",
-      "selectedCount": "{count} selected"
+      "selectedCount": "{count} selected",
+      "filters": "Filters",
+      "clearAll": "Clear All",
+      "customizeColumns": "Customize Columns",
+      "columns": "Columns",
+      "activeFilters": "Active filters:",
+      "clear": "Clear",
+      "changeStatus": "Change Status",
+      "activate": "Activate",
+      "deactivate": "Deactivate"
     }
   }
 }

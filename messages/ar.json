@@ -180,6 +180,16 @@
       "title": "مرافق الغرف",
       "description": "إدارة مرافق الغرف والمعدات.",
       "addAmenity": "إضافة مرفق",
+      "toolbar": {
+        "searchPlaceholder": "البحث في المرافق..."
+      },
+      "form": {
+        "equipmentName": "اسم المعدات",
+        "enterEquipmentName": "أدخل اسم المعدات",
+        "description": "الوصف",
+        "enterEquipmentDescription": "أدخل الوصف",
+        "selectType": "اختر النوع"
+      },
       "table": {
         "equipment": "المعدات",
         "type": "النوع",
@@ -240,6 +250,15 @@
       "title": "فئات الغرف",
       "description": "إدارة فئات الغرف لتنظيم مساحاتك.",
       "addCategory": "إضافة فئة",
+      "toolbar": {
+        "searchPlaceholder": "البحث في الفئات..."
+      },
+      "form": {
+        "categoryName": "اسم الفئة",
+        "enterCategoryName": "أدخل اسم الفئة",
+        "description": "الوصف",
+        "enterCategoryDescription": "أدخل الوصف"
+      },
       "table": {
         "name": "اسم الفئة",
         "description": "الوصف",
@@ -295,7 +314,16 @@
       "cancel": "إلغاء",
       "actions": "الإجراءات",
       "noResults": "لم يتم العثور على نتائج.",
-      "selectedCount": "تم اختيار {count}"
+      "selectedCount": "تم اختيار {count}",
+      "filters": "التصنيفات",
+      "clearAll": "مسح الكل",
+      "customizeColumns": "تخصيص الأعمدة",
+      "columns": "الأعمدة",
+      "activeFilters": "التصنيفات النشطة:",
+      "clear": "مسح",
+      "changeStatus": "تغيير الحالة",
+      "activate": "تنشيط",
+      "deactivate": "إلغاء التنشيط"
     }
   }
 }
