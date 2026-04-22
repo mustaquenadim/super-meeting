@@ -34,6 +34,7 @@ import {
   Trash2,
   MoreHorizontal,
 } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -203,11 +204,11 @@ function getBookingSortVal(booking: BookingRow, col: BookingColumnKey): string {
   }
 }
 
-function formatDetailValue(value: unknown) {
+function formatDetailValue(value: unknown, t: (key: string) => string) {
   if (value === null || value === undefined) return "-"
   if (typeof value === "string") return value.trim() ? value : "-"
   if (typeof value === "number") return String(value)
-  if (typeof value === "boolean") return value ? "Yes" : "No"
+  if (typeof value === "boolean") return value ? t("dialogs.view.yes") : t("dialogs.view.no")
   if (Array.isArray(value)) return value.length > 0 ? value.join(", ") : "-"
   if (typeof value === "object") return JSON.stringify(value)
   return String(value)
@@ -247,18 +248,18 @@ function getStatusIcon(status: BookingStatus) {
   }
 }
 
-function getStatusLabel(status: BookingStatus) {
+function getStatusLabel(status: BookingStatus, t: (key: string) => string) {
   switch (status) {
     case "pending":
-      return "Pending"
+      return t("status.pending")
     case "confirmed":
-      return "Confirmed"
+      return t("status.confirmed")
     case "visiting":
-      return "Visiting"
+      return t("status.visiting")
     case "completed":
-      return "Completed"
+      return t("status.completed")
     case "cancelled":
-      return "Cancelled"
+      return t("status.cancelled")
     default:
       return status
   }
@@ -272,6 +273,9 @@ function formatTime(time: string) {
 }
 
 export default function BookingsPage() {
+  const t = useTranslations("bookings")
+  const tCommon = useTranslations("common")
+  const tRoomsCommon = useTranslations("rooms.common")
   const { data: bookingsData, isLoading: bookingsLoading } = useBookings(1, 100)
   const { data: branchesData } = useBranches(1, 200)
   const { data: roomsData } = useRooms(1, 200)
@@ -283,22 +287,34 @@ export default function BookingsPage() {
     Record<BookingColumnKey, ColumnDefinition>
   >(
     () => ({
-      room: { label: "Room", sortable: true, defaultVisible: true },
-      branch: { label: "Branch", sortable: true, defaultVisible: true },
-      dateTime: { label: "Date & Time", sortable: true, defaultVisible: true },
-      organizer: { label: "Organizer", sortable: true, defaultVisible: true },
-      contact: { label: "Contact", sortable: true, defaultVisible: true },
-      payment: { label: "Payment", sortable: true, defaultVisible: true },
-      created: { label: "Created", sortable: true, defaultVisible: false },
-      status: { label: "Status", sortable: true, defaultVisible: true },
+      room: { label: t("table.room"), sortable: true, defaultVisible: true },
+      branch: { label: t("table.branch"), sortable: true, defaultVisible: true },
+      dateTime: {
+        label: t("table.dateTime"),
+        sortable: true,
+        defaultVisible: true,
+      },
+      organizer: {
+        label: t("table.organizer"),
+        sortable: true,
+        defaultVisible: true,
+      },
+      contact: { label: t("table.contact"), sortable: true, defaultVisible: true },
+      payment: { label: t("table.payment"), sortable: true, defaultVisible: true },
+      created: {
+        label: t("table.created"),
+        sortable: true,
+        defaultVisible: false,
+      },
+      status: { label: t("table.status"), sortable: true, defaultVisible: true },
       actions: {
-        label: "Actions",
+        label: t("table.actions"),
         sortable: false,
         defaultVisible: true,
         hideable: false,
       },
     }),
-    []
+    [t]
   )
 
   const [searchQuery, setSearchQuery] = React.useState("")
@@ -590,12 +606,13 @@ export default function BookingsPage() {
 
       if (failed === 0) {
         toast.success(
-          `Updated ${ids.length} booking${ids.length === 1 ? "" : "s"} to ${getStatusLabel(status)}.`
+          t("messages.bulkUpdated", {
+            count: ids.length,
+            status: getStatusLabel(status, t),
+          })
         )
       } else {
-        toast.error(
-          `Failed to update ${failed} booking${failed === 1 ? "" : "s"}.`
-        )
+        toast.error(t("messages.failedBulkUpdate", { count: failed }))
       }
 
       clearSelection()
@@ -613,13 +630,9 @@ export default function BookingsPage() {
     ).length
 
     if (failed === 0) {
-      toast.success(
-        `Deleted ${ids.length} booking${ids.length === 1 ? "" : "s"}.`
-      )
+      toast.success(t("messages.bulkDeleted", { count: ids.length }))
     } else {
-      toast.error(
-        `Failed to delete ${failed} booking${failed === 1 ? "" : "s"}.`
-      )
+      toast.error(t("messages.failedBulkDelete", { count: failed }))
     }
 
     clearSelection()
@@ -641,7 +654,7 @@ export default function BookingsPage() {
             room_id: editFormData.room ? Number(editFormData.room) : undefined,
           },
         })
-        toast.success("Booking updated.")
+        toast.success(t("messages.updated"))
       } catch (err: unknown) {
         const message =
           err instanceof Error ? err.message : "Failed to update booking."
@@ -659,7 +672,7 @@ export default function BookingsPage() {
 
     try {
       await deleteBooking.mutateAsync(Number(selectedBooking.id))
-      toast.success("Booking deleted.")
+      toast.success(t("messages.deleted"))
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Failed to delete booking."
@@ -712,8 +725,9 @@ export default function BookingsPage() {
               <div className="space-y-1">
                 <div className="font-medium">{booking.organizer}</div>
                 <div className="text-sm text-muted-foreground">
-                  {booking.attendees?.length ?? 0} attendee
-                  {(booking.attendees?.length ?? 0) === 1 ? "" : "s"}
+                  {t("table.attendees", {
+                    count: booking.attendees?.length ?? 0,
+                  })}
                 </div>
               </div>
             </DraggableTableCell>
@@ -762,7 +776,7 @@ export default function BookingsPage() {
           return (
             <DraggableTableCell key={col} columnKey={col}>
               <span className="text-sm font-medium">
-                {getStatusLabel(booking.status)}
+                {getStatusLabel(booking.status, t)}
               </span>
             </DraggableTableCell>
           )
@@ -777,26 +791,26 @@ export default function BookingsPage() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="h-8 w-8 p-0">
                     <MoreHorizontal className="h-4 w-4" />
-                    <span className="sr-only">Open booking actions</span>
+                    <span className="sr-only">{t("actions.openActions")}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40">
                   <DropdownMenuItem onClick={() => handleView(booking)}>
                     <Eye className="mr-2 h-4 w-4" />
-                    View
+                    {t("actions.view")}
                   </DropdownMenuItem>
                   {booking.status !== "cancelled" && (
                     <>
                       <DropdownMenuItem onClick={() => handleEdit(booking)}>
                         <Edit className="mr-2 h-4 w-4" />
-                        Edit
+                        {t("actions.edit")}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleDelete(booking)}
                         className="text-destructive focus:text-destructive"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
+                        {t("actions.delete")}
                       </DropdownMenuItem>
                     </>
                   )}
@@ -815,14 +829,12 @@ export default function BookingsPage() {
     <div className="min-w-0 space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Bookings</h1>
-          <p className="text-muted-foreground">
-            Manage room reservations, check status, and update booking details.
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("description")}</p>
         </div>
         <Link href="/admin/bookings/new" className={buttonVariants()}>
           <Plus className="mr-2 h-4 w-4" />
-          New Booking
+          {t("newBooking")}
         </Link>
       </div>
 
@@ -833,7 +845,7 @@ export default function BookingsPage() {
               <div className="relative max-w-sm flex-1">
                 <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Search by room, branch, organizer, or email..."
+                  placeholder={t("searchPlaceholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
@@ -845,7 +857,7 @@ export default function BookingsPage() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
                       <Filter className="h-4 w-4" />
-                      <span className="hidden lg:inline">Filters</span>
+                      <span className="hidden lg:inline">{t("filters")}</span>
                       {activeFilterCount > 0 && (
                         <Badge
                           variant="default"
@@ -863,7 +875,7 @@ export default function BookingsPage() {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center justify-between">
-                        <h3 className="font-semibold">Filters</h3>
+                        <h3 className="font-semibold">{t("filters")}</h3>
                         {activeFilterCount > 0 && (
                           <Button
                             variant="ghost"
@@ -875,13 +887,15 @@ export default function BookingsPage() {
                             className="h-7 text-xs"
                           >
                             <X className="mr-1 h-3 w-3" />
-                            Clear all
+                            {t("clearAll")}
                           </Button>
                         )}
                       </div>
 
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium">Status</Label>
+                        <Label className="text-sm font-medium">
+                          {t("statusLabel")}
+                        </Label>
                         <div className="flex flex-wrap gap-2">
                           {STATUS_OPTIONS.map((status) => (
                             <Button
@@ -897,7 +911,7 @@ export default function BookingsPage() {
                                 )
                               }
                             >
-                              {getStatusLabel(status)}
+                              {getStatusLabel(status, t)}
                             </Button>
                           ))}
                         </div>
@@ -911,9 +925,9 @@ export default function BookingsPage() {
                     <Button variant="outline" size="sm">
                       <Columns3Cog className="h-4 w-4" />
                       <span className="hidden lg:inline">
-                        Customize Columns
+                        {t("customizeColumns")}
                       </span>
-                      <span className="lg:hidden">Columns</span>
+                      <span className="lg:hidden">{t("columns")}</span>
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -937,11 +951,11 @@ export default function BookingsPage() {
             {activeFilterCount > 0 && (
               <div className="flex min-w-0 flex-wrap items-center gap-2">
                 <span className="text-xs text-muted-foreground">
-                  Active filters
+                  {t("activeFilters")}
                 </span>
                 {statusFilter !== "all" && (
                   <Badge variant="secondary" className="text-xs">
-                    Status: {getStatusLabel(statusFilter)}
+                    {t("statusLabel")}: {getStatusLabel(statusFilter, t)}
                     <button
                       onClick={() => setStatusFilter("all")}
                       className="ml-1 rounded-full p-0.5 hover:bg-destructive/20"
@@ -958,13 +972,13 @@ export default function BookingsPage() {
             <div className="flex items-center justify-between border-b bg-muted/50 px-4 py-3">
               <div className="flex items-center gap-3">
                 <Badge variant="secondary" className="text-sm font-medium">
-                  {selectedIds.size} selected
+                  {t("bulkSelected", { count: selectedIds.size })}
                 </Badge>
                 <button
                   onClick={clearSelection}
                   className="text-xs text-muted-foreground hover:text-foreground"
                 >
-                  Clear
+                  {t("clear")}
                 </button>
               </div>
 
@@ -973,7 +987,7 @@ export default function BookingsPage() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
                       <CheckCircle2 className="mr-2 h-4 w-4" />
-                      Change Status
+                      {t("changeStatus")}
                       <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -984,7 +998,7 @@ export default function BookingsPage() {
                         onClick={() => handleBulkStatusChange(status)}
                       >
                         <span className="mr-2">{getStatusIcon(status)}</span>
-                        {getStatusLabel(status)}
+                        {getStatusLabel(status, t)}
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
@@ -996,7 +1010,7 @@ export default function BookingsPage() {
                   onClick={() => setIsBulkDeleteDialogOpen(true)}
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
+                  {t("delete")}
                 </Button>
               </div>
             </div>
@@ -1027,7 +1041,7 @@ export default function BookingsPage() {
                           onCheckedChange={(value) =>
                             handleSelectAll(value === true)
                           }
-                          aria-label="Select all bookings on page"
+                          aria-label={t("table.selectAll")}
                         />
                       </TableHead>
                       {orderedVisibleColumns.map((col) => (
@@ -1055,7 +1069,7 @@ export default function BookingsPage() {
                         className="py-8 text-center"
                       >
                         <p className="text-muted-foreground">
-                          No bookings found.
+                          {t("noBookingsFound")}
                         </p>
                       </TableCell>
                     </TableRow>
@@ -1077,7 +1091,9 @@ export default function BookingsPage() {
                               onCheckedChange={(value) =>
                                 handleSelectRow(booking.id, value === true)
                               }
-                              aria-label={`Select booking ${booking.id}`}
+                              aria-label={t("table.selectRow", {
+                                id: booking.id,
+                              })}
                             />
                           </TableCell>
                           {orderedVisibleColumns.map((col) =>
@@ -1099,7 +1115,7 @@ export default function BookingsPage() {
             totalItems={totalItems}
             startIndex={startIndex}
             endIndex={endIndex}
-            itemLabel="bookings"
+            itemLabel={t("bookingsLabel", { count: totalItems })}
             onPageChange={setCurrentPage}
             onRowsPerPageChange={(rows) => {
               setRowsPerPage(rows)
@@ -1116,20 +1132,19 @@ export default function BookingsPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Delete {selectedIds.size} selected booking
-              {selectedIds.size === 1 ? "" : "s"}?
+              {t("dialogs.bulkDelete.title", { count: selectedIds.size })}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone.
+              {t("dialogs.bulkDelete.description")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{tRoomsCommon("cancel")}</AlertDialogCancel>
             <AlertDialogAction
               className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
               onClick={handleBulkDelete}
             >
-              Delete bookings
+              {t("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1138,49 +1153,57 @@ export default function BookingsPage() {
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[700px]">
           <DialogHeader>
-            <DialogTitle>Booking Details</DialogTitle>
-            <DialogDescription>
-              Review booking schedule, guest, and payment information.
-            </DialogDescription>
+            <DialogTitle>{t("dialogs.view.title")}</DialogTitle>
+            <DialogDescription>{t("dialogs.view.description")}</DialogDescription>
           </DialogHeader>
           {selectedBooking && (
             <div className="space-y-5">
               <div className="space-y-2">
                 <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                  Overview
+                  {t("dialogs.view.overview")}
                 </p>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">Booking ID</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.bookingId")}
+                    </p>
                     <p className="text-sm font-semibold">
                       {selectedBooking.id}
                     </p>
                   </div>
                   <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">Status</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.status")}
+                    </p>
                     <Badge
                       variant={getStatusVariant(selectedBooking.status)}
                       className="mt-0.5 flex w-fit items-center gap-1 text-xs"
                     >
                       {getStatusIcon(selectedBooking.status)}
-                      {getStatusLabel(selectedBooking.status)}
+                      {getStatusLabel(selectedBooking.status, t)}
                     </Badge>
                   </div>
                   <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">Branch</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.branch")}
+                    </p>
                     <p className="text-sm font-medium">
                       {formatDetailValue(
                         selectedBooking.branchName ||
-                          getBranchName(selectedBooking.branch)
+                          getBranchName(selectedBooking.branch),
+                        t
                       )}
                     </p>
                   </div>
                   <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">Room</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.room")}
+                    </p>
                     <p className="text-sm font-medium">
                       {formatDetailValue(
                         selectedBooking.roomName ||
-                          getRoomName(selectedBooking.room)
+                          getRoomName(selectedBooking.room),
+                        t
                       )}
                     </p>
                   </div>
@@ -1189,111 +1212,144 @@ export default function BookingsPage() {
 
               <div className="space-y-2">
                 <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                  Schedule
+                  {t("dialogs.view.schedule")}
                 </p>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">Date</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.date")}
+                    </p>
                     <p className="text-sm font-medium">
                       {format(selectedBooking.date, "MMM d, yyyy")}
                     </p>
                   </div>
                   <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">Duration</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.duration")}
+                    </p>
                     <p className="text-sm font-medium">
-                      {formatDetailValue(selectedBooking.duration)}
-                      {selectedBooking.duration ? " hr" : ""}
-                    </p>
-                  </div>
-                  <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">Start Time</p>
-                    <p className="text-sm font-medium">
-                      {formatDetailValue(selectedBooking.startTime)}
-                    </p>
-                  </div>
-                  <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">End Time</p>
-                    <p className="text-sm font-medium">
-                      {formatDetailValue(selectedBooking.endTime)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                  Access
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">PIN</p>
-                    <p className="font-mono text-sm font-medium">
-                      {formatDetailValue(selectedBooking.pin)}
-                    </p>
-                  </div>
-                  <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">Password</p>
-                    <p className="font-mono text-sm font-medium">
-                      {formatDetailValue(selectedBooking.password)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                  Guest Details
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">Name</p>
-                    <p className="text-sm font-medium">
-                      {formatDetailValue(selectedBooking.organizer)}
-                    </p>
-                  </div>
-                  <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">Phone</p>
-                    <p className="text-sm font-medium">
-                      {formatDetailValue(selectedBooking.phone)}
-                    </p>
-                  </div>
-                  <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">Email</p>
-                    <p className="text-sm font-medium break-all">
-                      {formatDetailValue(selectedBooking.email)}
-                    </p>
-                  </div>
-                  <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">Verified</p>
-                    <p className="text-sm font-medium">
-                      {selectedBooking.emailVerifiedAt ? "Yes" : "No"}
-                    </p>
-                  </div>
-                  <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">Photo</p>
-                    <p className="text-sm font-medium break-all">
-                      {formatDetailValue(selectedBooking.photo)}
+                      {selectedBooking.duration
+                        ? t("dialogs.view.durationHours", {
+                            count: Number(selectedBooking.duration),
+                          })
+                        : "-"}
                     </p>
                   </div>
                   <div className="rounded-md bg-muted/40 px-3 py-2">
                     <p className="text-xs text-muted-foreground">
-                      Existing Customer
+                      {t("dialogs.view.startTime")}
                     </p>
                     <p className="text-sm font-medium">
-                      {selectedBooking.existingCustomer ? "Yes" : "No"}
+                      {formatDetailValue(selectedBooking.startTime, t)}
+                    </p>
+                  </div>
+                  <div className="rounded-md bg-muted/40 px-3 py-2">
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.endTime")}
+                    </p>
+                    <p className="text-sm font-medium">
+                      {formatDetailValue(selectedBooking.endTime, t)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                  {t("dialogs.view.access")}
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded-md bg-muted/40 px-3 py-2">
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.pin")}
+                    </p>
+                    <p className="font-mono text-sm font-medium">
+                      {formatDetailValue(selectedBooking.pin, t)}
+                    </p>
+                  </div>
+                  <div className="rounded-md bg-muted/40 px-3 py-2">
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.password")}
+                    </p>
+                    <p className="font-mono text-sm font-medium">
+                      {formatDetailValue(selectedBooking.password, t)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                  {t("dialogs.view.guestDetails")}
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded-md bg-muted/40 px-3 py-2">
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.name")}
+                    </p>
+                    <p className="text-sm font-medium">
+                      {formatDetailValue(selectedBooking.organizer, t)}
+                    </p>
+                  </div>
+                  <div className="rounded-md bg-muted/40 px-3 py-2">
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.phone")}
+                    </p>
+                    <p className="text-sm font-medium">
+                      {formatDetailValue(selectedBooking.phone, t)}
+                    </p>
+                  </div>
+                  <div className="rounded-md bg-muted/40 px-3 py-2">
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.email")}
+                    </p>
+                    <p className="text-sm font-medium break-all">
+                      {formatDetailValue(selectedBooking.email, t)}
+                    </p>
+                  </div>
+                  <div className="rounded-md bg-muted/40 px-3 py-2">
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.verified")}
+                    </p>
+                    <p className="text-sm font-medium">
+                      {selectedBooking.emailVerifiedAt
+                        ? t("dialogs.view.yes")
+                        : t("dialogs.view.no")}
+                    </p>
+                  </div>
+                  <div className="rounded-md bg-muted/40 px-3 py-2">
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.photo")}
+                    </p>
+                    <p className="text-sm font-medium break-all">
+                      {formatDetailValue(selectedBooking.photo, t)}
+                    </p>
+                  </div>
+                  <div className="rounded-md bg-muted/40 px-3 py-2">
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.existingCustomer")}
+                    </p>
+                    <p className="text-sm font-medium">
+                      {selectedBooking.existingCustomer
+                        ? t("dialogs.view.yes")
+                        : t("dialogs.view.no")}
                     </p>
                   </div>
                   <div className="col-span-2 rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">Attendees</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.attendees")}
+                    </p>
                     <p className="text-sm font-medium">
-                      {formatDetailValue(selectedBooking.attendees)}
+                      {formatDetailValue(selectedBooking.attendees, t)}
                     </p>
                   </div>
                   {selectedBooking.purpose.trim() && (
                     <div className="col-span-2 rounded-md bg-muted/40 px-3 py-2">
-                      <p className="text-xs text-muted-foreground">Purpose</p>
+                      <p className="text-xs text-muted-foreground">
+                        {t("dialogs.view.purpose")}
+                      </p>
                       <p className="text-sm font-medium">
-                        {formatDetailValue(selectedBooking.purpose)}
+                        {formatDetailValue(selectedBooking.purpose, t)}
                       </p>
                     </div>
                   )}
@@ -1302,51 +1358,55 @@ export default function BookingsPage() {
 
               <div className="space-y-2">
                 <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                  Payment
+                  {t("dialogs.view.payment")}
                 </p>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   <div className="rounded-md bg-muted/40 px-3 py-2">
                     <p className="text-xs text-muted-foreground">
-                      Total Amount
+                      {t("dialogs.view.totalAmount")}
                     </p>
                     <p className="text-sm font-medium">
-                      {formatDetailValue(selectedBooking.totalAmount)}
-                    </p>
-                  </div>
-                  <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">Discount</p>
-                    <p className="text-sm font-medium">
-                      {formatDetailValue(selectedBooking.discountAmount)}
-                    </p>
-                  </div>
-                  <div className="rounded-md bg-muted/40 px-3 py-2">
-                    <p className="text-xs text-muted-foreground">Coupon</p>
-                    <p className="text-sm font-medium">
-                      {formatDetailValue(selectedBooking.coupon)}
+                      {formatDetailValue(selectedBooking.totalAmount, t)}
                     </p>
                   </div>
                   <div className="rounded-md bg-muted/40 px-3 py-2">
                     <p className="text-xs text-muted-foreground">
-                      Payment Method
+                      {t("dialogs.view.discount")}
                     </p>
                     <p className="text-sm font-medium">
-                      {formatDetailValue(selectedBooking.paymentMethod)}
+                      {formatDetailValue(selectedBooking.discountAmount, t)}
                     </p>
                   </div>
                   <div className="rounded-md bg-muted/40 px-3 py-2">
                     <p className="text-xs text-muted-foreground">
-                      Payment Status
+                      {t("dialogs.view.coupon")}
+                    </p>
+                    <p className="text-sm font-medium">
+                      {formatDetailValue(selectedBooking.coupon, t)}
+                    </p>
+                  </div>
+                  <div className="rounded-md bg-muted/40 px-3 py-2">
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.paymentMethod")}
+                    </p>
+                    <p className="text-sm font-medium">
+                      {formatDetailValue(selectedBooking.paymentMethod, t)}
+                    </p>
+                  </div>
+                  <div className="rounded-md bg-muted/40 px-3 py-2">
+                    <p className="text-xs text-muted-foreground">
+                      {t("dialogs.view.paymentStatus")}
                     </p>
                     <p className="text-sm font-medium capitalize">
-                      {formatDetailValue(selectedBooking.paymentStatus)}
+                      {formatDetailValue(selectedBooking.paymentStatus, t)}
                     </p>
                   </div>
                   <div className="rounded-md bg-muted/40 px-3 py-2">
                     <p className="text-xs text-muted-foreground">
-                      Transaction ID
+                      {t("dialogs.view.transactionId")}
                     </p>
                     <p className="text-sm font-medium">
-                      {formatDetailValue(selectedBooking.transactionId)}
+                      {formatDetailValue(selectedBooking.transactionId, t)}
                     </p>
                   </div>
                 </div>
@@ -1354,15 +1414,19 @@ export default function BookingsPage() {
 
               <div className="grid grid-cols-2 gap-2 border-t pt-4">
                 <div>
-                  <p className="text-xs text-muted-foreground">Created At</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t("dialogs.view.createdAt")}
+                  </p>
                   <p className="text-xs font-medium text-foreground/80">
-                    {formatDetailValue(selectedBooking.createdAt)}
+                    {formatDetailValue(selectedBooking.createdAt, t)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Updated At</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t("dialogs.view.updatedAt")}
+                  </p>
                   <p className="text-xs font-medium text-foreground/80">
-                    {formatDetailValue(selectedBooking.updatedAt)}
+                    {formatDetailValue(selectedBooking.updatedAt, t)}
                   </p>
                 </div>
               </div>
@@ -1375,7 +1439,7 @@ export default function BookingsPage() {
                     setSelectedBooking(null)
                   }}
                 >
-                  Close
+                  {t("dialogs.view.close")}
                 </Button>
                 {selectedBooking.status !== "cancelled" && (
                   <Button
@@ -1384,7 +1448,7 @@ export default function BookingsPage() {
                       handleEdit(selectedBooking)
                     }}
                   >
-                    Edit Booking
+                    {t("dialogs.view.editBooking")}
                   </Button>
                 )}
               </DialogFooter>
@@ -1396,15 +1460,13 @@ export default function BookingsPage() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[700px]">
           <DialogHeader>
-            <DialogTitle>Edit Booking</DialogTitle>
-            <DialogDescription>
-              Update room, date, and reservation time for this booking.
-            </DialogDescription>
+            <DialogTitle>{t("dialogs.edit.title")}</DialogTitle>
+            <DialogDescription>{t("dialogs.edit.description")}</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleEditSubmit}>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="edit-room">Room</FieldLabel>
+                <FieldLabel htmlFor="edit-room">{t("dialogs.edit.room")}</FieldLabel>
                 <Select
                   value={editFormData.room}
                   onValueChange={(value) =>
@@ -1413,12 +1475,12 @@ export default function BookingsPage() {
                   required
                 >
                   <SelectTrigger id="edit-room">
-                    <SelectValue placeholder="Select room" />
+                    <SelectValue placeholder={t("dialogs.edit.selectRoom")} />
                   </SelectTrigger>
                   <SelectContent>
                     {rooms.map((room) => (
                       <SelectItem key={room.id} value={room.id}>
-                        {room.name} ({room.capacity} capacity)
+                        {room.name} ({t("dialogs.edit.capacity", { count: room.capacity })})
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -1426,7 +1488,7 @@ export default function BookingsPage() {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="edit-date">Date</FieldLabel>
+                <FieldLabel htmlFor="edit-date">{t("dialogs.edit.date")}</FieldLabel>
                 <Popover>
                   <PopoverTrigger>
                     <Button
@@ -1440,7 +1502,7 @@ export default function BookingsPage() {
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {editFormData.date
                         ? format(editFormData.date, "PPP")
-                        : "Pick a date"}
+                        : t("dialogs.edit.pickDate")}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -1457,7 +1519,9 @@ export default function BookingsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <Field>
-                  <FieldLabel htmlFor="edit-start-time">Start Time</FieldLabel>
+                  <FieldLabel htmlFor="edit-start-time">
+                    {t("dialogs.edit.startTime")}
+                  </FieldLabel>
                   <Input
                     type="time"
                     id="edit-start-time"
@@ -1475,7 +1539,9 @@ export default function BookingsPage() {
                 </Field>
 
                 <Field>
-                  <FieldLabel htmlFor="edit-end-time">End Time</FieldLabel>
+                  <FieldLabel htmlFor="edit-end-time">
+                    {t("dialogs.edit.endTime")}
+                  </FieldLabel>
                   <Input
                     type="time"
                     id="edit-end-time"
@@ -1503,7 +1569,7 @@ export default function BookingsPage() {
                   }}
                   disabled={updateBooking.status === "pending"}
                 >
-                  Cancel
+                  {tRoomsCommon("cancel")}
                 </Button>
                 <Button
                   type="submit"
@@ -1512,7 +1578,7 @@ export default function BookingsPage() {
                   {updateBooking.status === "pending" && (
                     <Spinner className="mr-2" />
                   )}
-                  Update Booking
+                  {t("dialogs.edit.updateBooking")}
                 </Button>
               </DialogFooter>
             </FieldGroup>
@@ -1523,9 +1589,9 @@ export default function BookingsPage() {
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Delete Booking</DialogTitle>
+            <DialogTitle>{t("dialogs.delete.title")}</DialogTitle>
             <DialogDescription>
-              This booking will be permanently removed.
+              {t("dialogs.delete.description")}
             </DialogDescription>
           </DialogHeader>
           {selectedBooking && (
@@ -1535,11 +1601,11 @@ export default function BookingsPage() {
                   {getRoomName(selectedBooking.room)}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  {format(selectedBooking.date, "MMM d, yyyy")} at{" "}
+                  {format(selectedBooking.date, "MMM d, yyyy")} {t("dialogs.delete.at")}{" "}
                   {formatTime(selectedBooking.startTime)}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Organized by {selectedBooking.organizer}
+                  {t("dialogs.delete.organizedBy", { name: selectedBooking.organizer })}
                 </div>
               </div>
               <DialogFooter>
@@ -1550,10 +1616,10 @@ export default function BookingsPage() {
                     setSelectedBooking(null)
                   }}
                 >
-                  Cancel
+                  {tRoomsCommon("cancel")}
                 </Button>
                 <Button variant="destructive" onClick={handleDeleteConfirm}>
-                  Delete
+                  {t("delete")}
                 </Button>
               </DialogFooter>
             </div>

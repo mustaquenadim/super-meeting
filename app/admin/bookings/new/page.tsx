@@ -4,6 +4,7 @@ import { format } from "date-fns"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 import { PageHeader } from "@/components/admin/page-header"
 import { Button } from "@/components/ui/button"
@@ -60,6 +61,7 @@ import {
   ZoomOutIcon,
   CircleUserRoundIcon,
 } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 const today = new Date()
 const timeSlots = [
@@ -148,6 +150,8 @@ async function getCroppedImg(
 }
 
 export default function NewBookingPage() {
+  const t = useTranslations("bookings.new")
+  const tCommon = useTranslations("common")
   const router = useRouter()
   const createBookingMutation = useCreateBooking()
   const { data: roomsData } = useRooms(1, 200)
@@ -303,7 +307,7 @@ export default function NewBookingPage() {
         setOtpRequestError(
           typeof json?.error === "string"
             ? json.error
-            : "Unable to send verification code right now."
+            : t("messages.otpError")
         )
         return
       }
@@ -320,7 +324,7 @@ export default function NewBookingPage() {
         setOtpRequestSuccess(
           typeof json.message === "string"
             ? json.message
-            : "This email is already verified."
+            : t("messages.alreadyVerified")
         )
         return
       }
@@ -331,10 +335,10 @@ export default function NewBookingPage() {
       setOtpRequestSuccess(
         typeof json?.message === "string"
           ? json.message
-          : "Verification code sent to your email."
+          : t("messages.otpSentSuccess")
       )
     } catch {
-      setOtpRequestError("Unable to send verification code right now.")
+      setOtpRequestError(t("messages.otpError"))
     } finally {
       setIsSendingOtp(false)
     }
@@ -345,7 +349,7 @@ export default function NewBookingPage() {
 
     const normalizedEmail = email.trim().toLowerCase()
     if (!normalizedEmail) {
-      setOtpRequestError("Email is required for verification.")
+      setOtpRequestError(t("messages.emailRequired"))
       return
     }
 
@@ -368,15 +372,15 @@ export default function NewBookingPage() {
         setOtpRequestError(
           typeof json?.error === "string"
             ? json.error
-            : "Unable to complete verification right now."
+            : t("messages.otpVerifyError")
         )
         return
       }
 
       setIsEmailVerified(true)
-      setOtpRequestSuccess("Email verified successfully.")
+      setOtpRequestSuccess(t("messages.otpVerifySuccess"))
     } catch {
-      setOtpRequestError("Unable to complete verification right now.")
+      setOtpRequestError(t("messages.otpVerifyError"))
     } finally {
       setIsConfirmingOtp(false)
     }
@@ -387,7 +391,7 @@ export default function NewBookingPage() {
 
     if (!pin) {
       setCustomerPinVerificationSuccess(null)
-      setCustomerPinVerificationError("Customer PIN is required.")
+      setCustomerPinVerificationError(t("messages.pinRequired"))
       return
     }
 
@@ -420,7 +424,7 @@ export default function NewBookingPage() {
         setCustomerPinVerificationError(
           typeof json?.error === "string"
             ? json.error
-            : "Unable to verify customer PIN right now."
+            : t("messages.pinError")
         )
         return
       }
@@ -430,13 +434,13 @@ export default function NewBookingPage() {
       setCustomerPinVerificationSuccess(
         typeof json.message === "string"
           ? json.message
-          : "Customer PIN verified."
+          : t("messages.pinVerified")
       )
     } catch {
       setIsCustomerPinVerified(false)
       setCustomerPinVerificationSuccess(null)
       setCustomerPinVerificationError(
-        "Unable to verify customer PIN right now."
+        t("messages.pinError")
       )
     } finally {
       setIsVerifyingCustomerPin(false)
@@ -448,47 +452,47 @@ export default function NewBookingPage() {
     const title = bookingTitle.trim()
 
     if (!title) {
-      toast.error("Booking title is required.")
+      toast.error(t("messages.titleRequired"))
       return
     }
 
     if (!selectedLocation) {
-      toast.error("Please select a location.")
+      toast.error(t("messages.locationRequired"))
       return
     }
 
     if (!selectedRoom) {
-      toast.error("Please select a room.")
+      toast.error(t("messages.roomRequired"))
       return
     }
 
     if (!time) {
-      toast.error("Please select a booking time.")
+      toast.error(t("messages.timeRequired"))
       return
     }
 
     if (!normalizedEmail) {
-      toast.error("Email address is required.")
+      toast.error(t("messages.emailRequired"))
       return
     }
 
     if (!phoneNumber.trim()) {
-      toast.error("Phone number is required.")
+      toast.error(t("messages.phoneRequired"))
       return
     }
 
     if (isExistingCustomer && !customerPin.trim()) {
-      toast.error("Customer PIN is required for existing customers.")
+      toast.error(t("messages.pinRequired"))
       return
     }
 
     if (isExistingCustomer && !isCustomerPinVerified) {
-      toast.error("Please verify customer PIN before creating the booking.")
+      toast.error(t("messages.verifyPinFirst"))
       return
     }
 
     if (!isEmailVerified) {
-      toast.error("Please verify the guest email before creating the booking.")
+      toast.error(t("messages.verifyEmailFirst"))
       return
     }
 
@@ -508,9 +512,7 @@ export default function NewBookingPage() {
         paymentMethod === "credit_card" &&
         (!Number.isFinite(computedAmount) || computedAmount <= 0)
       ) {
-        toast.error(
-          "Please set a room price before taking credit card payments for this booking."
-        )
+        toast.error(t("messages.priceRequired"))
         return
       }
 
@@ -545,7 +547,7 @@ export default function NewBookingPage() {
         transaction_id: undefined,
       })
 
-      toast.success("Booking created successfully.")
+      toast.success(t("messages.success"))
       if (paymentMethod === "credit_card" && result?.paymentUrl) {
         window.location.assign(result.paymentUrl)
         return
@@ -556,7 +558,7 @@ export default function NewBookingPage() {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Unable to create the booking right now."
+          : t("messages.error")
       )
     }
   }
@@ -564,19 +566,19 @@ export default function NewBookingPage() {
   return (
     <div className="flex flex-1 flex-col gap-6 pt-0">
       <PageHeader
-        title="Create New Booking"
-        description="Reserve a meeting room"
+        title={t("title")}
+        description={t("description")}
         action={{
           label:
             createBookingMutation.status === "pending"
-              ? "Creating..."
-              : "Create Booking",
+              ? t("creating")
+              : t("createBooking"),
           icon: <SaveIcon className="size-4" />,
           onClick: handleCreateBooking,
           disabled: createBookingMutation.status === "pending",
         }}
         secondaryAction={{
-          label: "Back",
+          label: t("back"),
           icon: <ArrowLeftIcon className="size-4" />,
           href: "/admin/bookings",
         }}
@@ -586,22 +588,22 @@ export default function NewBookingPage() {
         <div className="space-y-6 lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Booking Details</CardTitle>
-              <CardDescription>Fill in the booking information</CardDescription>
+              <CardTitle>{t("bookingDetails")}</CardTitle>
+              <CardDescription>{t("fillInfo")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Booking Title</Label>
+                <Label>{t("bookingTitle")}</Label>
                 <Input
-                  placeholder="e.g. Team Standup, Client Meeting..."
+                  placeholder={t("titlePlaceholder")}
                   value={bookingTitle}
                   onChange={(event) => setBookingTitle(event.target.value)}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Description (optional)</Label>
+                <Label>{t("descriptionLabel")}</Label>
                 <Textarea
-                  placeholder="Add notes or description..."
+                  placeholder={t("descriptionPlaceholder")}
                   rows={2}
                   value={bookingDescription}
                   onChange={(event) =>
@@ -611,13 +613,13 @@ export default function NewBookingPage() {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>Location</Label>
+                  <Label>{t("location")}</Label>
                   <Select
                     value={selectedLocation}
                     onValueChange={setSelectedLocation}
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select location" />
+                      <SelectValue placeholder={t("selectLocation")} />
                     </SelectTrigger>
                     <SelectContent>
                       {mockLocations
@@ -631,17 +633,17 @@ export default function NewBookingPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Room</Label>
+                  <Label>{t("room")}</Label>
                   <Select value={selectedRoom} onValueChange={setSelectedRoom}>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select room" />
+                      <SelectValue placeholder={t("selectRoom")} />
                     </SelectTrigger>
                     <SelectContent>
                       {mockRooms
                         .filter((r) => r.status === "available")
                         .map((room) => (
                           <SelectItem key={room.id} value={room.id}>
-                            {room.name} (up to {room.capacity})
+                            {room.name} ({t("capacity", { count: room.capacity })})
                           </SelectItem>
                         ))}
                     </SelectContent>
@@ -649,12 +651,12 @@ export default function NewBookingPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Email Address</Label>
+                <Label>{t("email")}</Label>
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <Input
                     className="min-w-0 flex-1"
                     type="email"
-                    placeholder="guest@example.com"
+                    placeholder={t("emailPlaceholder")}
                     value={email}
                     onChange={(event) => {
                       if (email !== event.target.value) {
@@ -674,10 +676,10 @@ export default function NewBookingPage() {
                     disabled={!email || isEmailVerified || isSendingOtp}
                   >
                     {isEmailVerified
-                      ? "Verified"
+                      ? t("verified")
                       : isSendingOtp
-                        ? "Sending..."
-                        : "Verify"}
+                        ? t("sending")
+                        : t("verify")}
                   </Button>
                 </div>
                 {otpRequestError ? (
@@ -690,7 +692,7 @@ export default function NewBookingPage() {
                 ) : null}
                 {isOtpRequested && !isEmailVerified ? (
                   <div className="space-y-2 pt-2">
-                    <Label>Enter 6-digit OTP</Label>
+                    <Label>{t("otpLabel")}</Label>
                     <InputOTP
                       maxLength={6}
                       value={otp}
@@ -708,17 +710,17 @@ export default function NewBookingPage() {
                         onClick={handleConfirmOtp}
                         disabled={otp.length !== 6 || isConfirmingOtp}
                       >
-                        {isConfirmingOtp ? "Confirming..." : "Confirm code"}
+                        {isConfirmingOtp ? t("confirming") : t("confirmCode")}
                       </Button>
                       <span className="text-sm text-muted-foreground">
-                        We sent a 6-digit code to your email.
+                        {t("otpSent")}
                       </span>
                     </div>
                   </div>
                 ) : null}
               </div>
               <div className="space-y-2">
-                <Label>Phone Number</Label>
+                <Label>{t("phone")}</Label>
                 <PhoneInput
                   placeholder="+966 5 5555 5555"
                   defaultCountry="SA"
@@ -728,12 +730,12 @@ export default function NewBookingPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Photo</Label>
+                <Label>{t("photo")}</Label>
                 <div className="flex-inline gap-2">
                   <div className="relative inline-flex">
                     <button
                       aria-label={
-                        finalImageUrl ? "Change photo" : "Upload photo"
+                        finalImageUrl ? t("changePhoto") : t("uploadPhoto")
                       }
                       className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-input bg-muted/50 transition-colors hover:bg-muted"
                       data-dragging={isDragging || undefined}
@@ -764,7 +766,7 @@ export default function NewBookingPage() {
                     </button>
                     {finalImageUrl && (
                       <Button
-                        aria-label="Remove photo"
+                        aria-label={t("removePhoto")}
                         className="absolute top-0 right-0 h-6 w-6 rounded-full border-2 border-background bg-background shadow-sm"
                         onClick={handleRemoveFinalImage}
                         size="icon"
@@ -783,20 +785,20 @@ export default function NewBookingPage() {
                     tabIndex={-1}
                   />
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Upload and crop a guest photo for access.
+                    {t("photoDescription")}
                   </p>
                 </div>
               </div>
               <Dialog onOpenChange={setIsDialogOpen} open={isDialogOpen}>
                 <DialogContent className="gap-0 p-0 sm:max-w-140 *:[button]:hidden">
                   <DialogDescription className="sr-only">
-                    Crop image dialog
+                    {t("cropTitle")}
                   </DialogDescription>
                   <DialogHeader className="contents space-y-0 text-start">
                     <DialogTitle className="flex items-center justify-between border-b p-4 text-base">
                       <div className="flex items-center gap-2">
                         <Button
-                          aria-label="Cancel"
+                          aria-label={t("cancel")}
                           className="-my-1 opacity-60"
                           onClick={() => setIsDialogOpen(false)}
                           size="icon"
@@ -805,7 +807,7 @@ export default function NewBookingPage() {
                         >
                           <ArrowLeftIcon aria-hidden="true" />
                         </Button>
-                        <span>Crop image</span>
+                        <span>{t("cropTitle")}</span>
                       </div>
                       <Button
                         autoFocus
@@ -813,7 +815,7 @@ export default function NewBookingPage() {
                         disabled={!previewUrl}
                         onClick={handleApply}
                       >
-                        Apply
+                        {t("apply")}
                       </Button>
                     </DialogTitle>
                   </DialogHeader>
@@ -858,9 +860,9 @@ export default function NewBookingPage() {
               <div className="">
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <p className="text-sm font-medium">Existing Customer?</p>
+                    <p className="text-sm font-medium">{t("existingCustomer")}</p>
                     <p className="text-sm text-muted-foreground">
-                      Verify with customer PIN and waive the payment.
+                      {t("existingCustomerDesc")}
                     </p>
                   </div>
                   <Switch
@@ -876,17 +878,17 @@ export default function NewBookingPage() {
               </div>
               {!isExistingCustomer ? (
                 <div className="space-y-2">
-                  <Label>Promo Code</Label>
+                  <Label>{t("promoCode")}</Label>
                   <div className="flex gap-2">
-                    <Input placeholder="Enter code" />
-                    <Button variant="outline">Apply</Button>
+                    <Input placeholder={t("enterCode")} />
+                    <Button variant="outline">{t("applyCode")}</Button>
                   </div>
                 </div>
               ) : null}
 
               {isExistingCustomer ? (
                 <div className="space-y-2">
-                  <Label>Customer PIN</Label>
+                  <Label>{t("enterPin")}</Label>
                   <div className="flex flex-col gap-2 sm:flex-row">
                     <Input
                       type="password"
@@ -897,7 +899,7 @@ export default function NewBookingPage() {
                         setCustomerPinVerificationError(null)
                         setCustomerPinVerificationSuccess(null)
                       }}
-                      placeholder="Enter customer PIN"
+                      placeholder={t("pinPlaceholder")}
                     />
                     <Button
                       type="button"
@@ -910,10 +912,10 @@ export default function NewBookingPage() {
                       }
                     >
                       {isCustomerPinVerified
-                        ? "Verified"
+                        ? t("verified")
                         : isVerifyingCustomerPin
-                          ? "Verifying..."
-                          : "Verify"}
+                          ? t("verifying")
+                          : t("verify")}
                     </Button>
                   </div>
                   {customerPinVerificationError ? (
@@ -932,7 +934,7 @@ export default function NewBookingPage() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <Label>Payment Method</Label>
+                  <Label>{t("paymentMethod")}</Label>
                   <RadioGroup
                     value={paymentMethod}
                     onValueChange={setPaymentMethod}
@@ -941,19 +943,19 @@ export default function NewBookingPage() {
                     <label className="">
                       <div className="flex items-center gap-3">
                         <RadioGroupItem value="credit_card" />
-                        <span>Credit Card</span>
+                        <span>{t("creditCard")}</span>
                       </div>
                     </label>
                     <label className="">
                       <div className="flex items-center gap-3">
                         <RadioGroupItem value="bank_transfer" />
-                        <span>Bank Transfer</span>
+                        <span>{t("bankTransfer")}</span>
                       </div>
                     </label>
                     <label className="">
                       <div className="flex items-center gap-3">
                         <RadioGroupItem value="cash" />
-                        <span>Cash</span>
+                        <span>{t("cashAtBranch")}</span>
                       </div>
                     </label>
                   </RadioGroup>
@@ -964,9 +966,9 @@ export default function NewBookingPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Date & Time</CardTitle>
+              <CardTitle>{t("dateTime")}</CardTitle>
               <CardDescription>
-                Select the booking date and available slot
+                {t("selectDateTimeDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -1024,24 +1026,24 @@ export default function NewBookingPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Booking Summary</CardTitle>
+              <CardTitle>{t("bookingSummary")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Room Rate</span>
-                <span>SAR 0.00</span>
+                <span className="text-muted-foreground">{t("roomRate")}</span>
+                <span>{t("currency")} 0.00</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Resources</span>
-                <span>SAR 0.00</span>
+                <span className="text-muted-foreground">{t("resources")}</span>
+                <span>{t("currency")} 0.00</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Discount</span>
-                <span className="text-green-600">-SAR 0.00</span>
+                <span className="text-muted-foreground">{t("discount")}</span>
+                <span className="text-green-600">-{t("currency")} 0.00</span>
               </div>
               <div className="flex justify-between border-t pt-3 font-medium">
-                <span>Total</span>
-                <span>SAR 0.00</span>
+                <span>{t("total")}</span>
+                <span>{t("currency")} 0.00</span>
               </div>
             </CardContent>
           </Card>
