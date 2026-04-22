@@ -1,4 +1,17 @@
 {
+  "common": {
+    "pagination": {
+      "showing": "عرض {start} إلى {end} من {total} {label}",
+      "rowsPerPage": "صفوف في الصفحة",
+      "page": "الصفحة",
+      "of": "من {total}",
+      "first": "انتقل إلى الصفحة الأولى",
+      "previous": "انتقل إلى الصفحة السابقة",
+      "next": "انتقل إلى الصفحة التالية",
+      "last": "انتقل إلى الصفحة الأخيرة",
+      "items": "عناصر"
+    }
+  },
   "sidebar": {
     "logoAlt": "شعار سوبر أوفيس",
     "group": {
@@ -104,6 +117,7 @@
   },
   "rooms": {
     "title": "الغرف",
+    "roomsLabel": "{count, plural, one {غرفة} two {غرفتان} few {غرف} many {غرفة} other {غرف}}",
     "description": "إدارة الغرف في مواقعك",
     "addRoom": "إضافة غرفة",
     "addNewRoom": "إضافة غرفة جديدة",
@@ -128,6 +142,11 @@
     "delete": "حذف",
     "deleteTitle": "حذف الغرفة؟",
     "deleteDescription": "هل أنت متأكد أنك تريد حذف \"{name}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+    "delete": {
+      "aboutToDelete": "أنت على وشك حذف:",
+      "bulkTitle": "حذف {count} {count, plural, one {غرفة} other {غرف}}؟",
+      "bulkDescription": "سيتم حذف {count} {count, plural, one {غرفة مختارة} other {غرف مختارة}} بشكل دائم. لا يمكن التراجع عن هذا الإجراء."
+    },
     "table": {
       "name": "الاسم",
       "location": "الموقع",
@@ -180,6 +199,7 @@
       "title": "مرافق الغرف",
       "description": "إدارة مرافق الغرف والمعدات.",
       "addAmenity": "إضافة مرفق",
+      "equipmentLabel": "{count, plural, one {عنصر} two {عنصران} few {عناصر} many {عنصراً} other {عناصر}}",
       "toolbar": {
         "searchPlaceholder": "البحث في المرافق..."
       },
@@ -220,7 +240,7 @@
         },
         "delete": {
           "title": "حذف المرفق",
-          "description": "هل أنت متأكد أنك تريد حذف \"{name}\"؟",
+          "description": "هل أنت متأكد أنك تريد حذف",
           "fallbackName": "هذا المرفق"
         },
         "bulkDelete": {
@@ -250,6 +270,7 @@
       "title": "فئات الغرف",
       "description": "إدارة فئات الغرف لتنظيم مساحاتك.",
       "addCategory": "إضافة فئة",
+      "categoryLabel": "{count, plural, one {فئة} two {فئتان} few {فئات} many {فئة} other {فئات}}",
       "toolbar": {
         "searchPlaceholder": "البحث في الفئات..."
       },

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import {
   ChevronLeft,
   ChevronRight,
@@ -37,10 +38,11 @@ export function DataTablePagination({
   totalItems,
   startIndex,
   endIndex,
-  itemLabel = "items",
+  itemLabel,
   onPageChange,
   onRowsPerPageChange,
 }: DataTablePaginationProps) {
+  const t = useTranslations("common.pagination");
   const [pageInput, setPageInput] = React.useState(currentPage.toString());
 
   React.useEffect(() => {
@@ -75,13 +77,17 @@ export function DataTablePagination({
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 border-t px-4 py-3">
       <div className="text-sm text-muted-foreground">
-        Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of{" "}
-        {totalItems} {itemLabel}
+        {t("showing", {
+          start: startIndex + 1,
+          end: Math.min(endIndex, totalItems),
+          total: totalItems,
+          label: itemLabel || t("items"),
+        })}
       </div>
       <div className="flex items-center gap-4">
         <div className="hidden items-center gap-2 lg:flex">
           <Label htmlFor="rows-per-page" className="text-sm font-medium">
-            Rows per page
+            {t("rowsPerPage")}
           </Label>
           <Select
             value={rowsPerPage.toString()}
@@ -107,7 +113,7 @@ export function DataTablePagination({
               htmlFor="page-input"
               className="text-sm font-medium whitespace-nowrap"
             >
-              Page
+              {t("page")}
             </Label>
             <Input
               id="page-input"
@@ -120,7 +126,7 @@ export function DataTablePagination({
               inputMode="numeric"
             />
             <span className="text-sm font-medium whitespace-nowrap">
-              of {totalPages}
+              {t("of", { total: totalPages })}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -130,7 +136,7 @@ export function DataTablePagination({
               onClick={() => onPageChange(1)}
               disabled={currentPage === 1}
             >
-              <span className="sr-only">Go to first page</span>
+              <span className="sr-only">{t("first")}</span>
               <ChevronsLeft className="h-4 w-4" />
             </Button>
             <Button
@@ -140,7 +146,7 @@ export function DataTablePagination({
               onClick={() => onPageChange(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
             >
-              <span className="sr-only">Go to previous page</span>
+              <span className="sr-only">{t("previous")}</span>
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <Button
@@ -150,7 +156,7 @@ export function DataTablePagination({
               onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
             >
-              <span className="sr-only">Go to next page</span>
+              <span className="sr-only">{t("next")}</span>
               <ChevronRight className="h-4 w-4" />
             </Button>
             <Button
@@ -160,7 +166,7 @@ export function DataTablePagination({
               onClick={() => onPageChange(totalPages)}
               disabled={currentPage === totalPages}
             >
-              <span className="sr-only">Go to last page</span>
+              <span className="sr-only">{t("last")}</span>
               <ChevronsRight className="h-4 w-4" />
             </Button>
           </div>

@@ -723,7 +723,7 @@ export default function RoomCategoriesPage() {
             totalItems={totalItems}
             startIndex={startIndex}
             endIndex={endIndex}
-            itemLabel="categories"
+            itemLabel={t("categoryLabel", { count: totalItems })}
             onPageChange={setCurrentPage}
             onRowsPerPageChange={(rows) => {
               setRowsPerPage(rows)
@@ -747,12 +747,12 @@ export default function RoomCategoriesPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
             <AlertDialogAction
               className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
               onClick={handleBulkDelete}
             >
-              Delete
+              {tCommon("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

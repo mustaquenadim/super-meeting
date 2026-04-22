@@ -470,7 +470,7 @@ export default function RoomAmenitiesPage() {
       case "type":
         return (
           <DraggableTableCell key={col} columnKey={col}>
-            <Badge variant="outline">{t(`types.${item.type}`)}</Badge>
+            <Badge variant="outline">{t(`types.${item.type || "other"}`)}</Badge>
           </DraggableTableCell>
         )
       case "description":
@@ -570,7 +570,7 @@ export default function RoomAmenitiesPage() {
                     <Button variant="outline" size="sm">
                       <Filter className="h-4 w-4" />
                       <span className="hidden lg:inline">
-                        {t("toolbar.filters")}
+                        {tCommon("filters")}
                       </span>
                       {activeFilterCount > 0 && (
                         <Badge
@@ -589,9 +589,7 @@ export default function RoomAmenitiesPage() {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center justify-between">
-                        <h3 className="font-semibold">
-                          {t("toolbar.filters")}
-                        </h3>
+                          {tCommon("filters")}
                         {activeFilterCount > 0 && (
                           <Button
                             variant="ghost"
@@ -603,7 +601,7 @@ export default function RoomAmenitiesPage() {
                             className="h-7 text-xs"
                           >
                             <X className="mr-1 h-3 w-3" />
-                            {t("toolbar.clearAll")}
+                            {tCommon("clearAll")}
                           </Button>
                         )}
                       </div>
@@ -835,7 +833,7 @@ export default function RoomAmenitiesPage() {
             totalItems={totalItems}
             startIndex={startIndex}
             endIndex={endIndex}
-            itemLabel="equipment"
+            itemLabel={t("equipmentLabel", { count: totalItems })}
             onPageChange={setCurrentPage}
             onRowsPerPageChange={(rows) => {
               setRowsPerPage(rows)
@@ -1001,7 +999,7 @@ export default function RoomAmenitiesPage() {
                   {createAmenity.status === "pending" && (
                     <Spinner className="me-2" />
                   )}
-                  {t("addEquipment")}
+                  {t("addAmenity")}
                 </Button>
               </DialogFooter>
             </FieldGroup>
@@ -1149,7 +1147,7 @@ export default function RoomAmenitiesPage() {
                     {t("table.type")}
                   </div>
                   <Badge variant="outline">
-                    {t(`types.${selectedEquipment.type}`)}
+                    {t(`types.${selectedEquipment.type || "other"}`)}
                   </Badge>
                 </div>
 

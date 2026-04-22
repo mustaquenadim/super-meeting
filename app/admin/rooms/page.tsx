@@ -96,6 +96,7 @@ import { ViewRoomDialog } from "./_components/view-room-dialog"
 
 export default function RoomsPage() {
   const t = useTranslations("rooms")
+  const tCommon = useTranslations("rooms.common")
 
   const ROOM_COLUMNS: Record<RoomColumnKey, ColumnDefinition> = React.useMemo(
     () => ({
@@ -801,7 +802,7 @@ export default function RoomsPage() {
               totalItems={totalItems}
               startIndex={startIndex}
               endIndex={endIndex}
-              itemLabel="rooms"
+              itemLabel={t("roomsLabel", { count: totalItems })}
               onPageChange={setCurrentPage}
               onRowsPerPageChange={(r) => {
                 setRowsPerPage(r)
@@ -847,16 +848,15 @@ export default function RoomsPage() {
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Delete room?</DialogTitle>
+            <DialogTitle>{t("deleteTitle")}</DialogTitle>
             <DialogDescription>
-              This will permanently delete this room. This action cannot be
-              undone.
+              {t("deleteDescription", { name: selectedRoom?.name ?? "" })}
             </DialogDescription>
           </DialogHeader>
           {selectedRoom && (
             <div className="py-4">
               <p className="text-sm text-muted-foreground">
-                You are about to delete:
+                {t("delete.aboutToDelete")}
               </p>
               <code className="mt-2 inline-block rounded bg-muted px-2 py-1 font-mono text-sm font-semibold">
                 {selectedRoom.name}
@@ -869,7 +869,7 @@ export default function RoomsPage() {
               onClick={() => setIsDeleteDialogOpen(false)}
               disabled={deleteRoom.status === "pending"}
             >
-              Cancel
+              {tCommon("cancel")}
             </Button>
             <Button
               variant="destructive"
@@ -878,7 +878,7 @@ export default function RoomsPage() {
             >
               {deleteRoom.status === "pending" && <Spinner className="me-2" />}
               <Trash2 className="me-2 h-4 w-4" />
-              Delete
+              {tCommon("delete")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -891,22 +891,19 @@ export default function RoomsPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Delete {selectedIds.size} room
-              {selectedIds.size > 1 ? "s" : ""}?
+              {t("delete.bulkTitle", { count: selectedIds.size })}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the selected{" "}
-              {selectedIds.size === 1 ? "room" : `${selectedIds.size} rooms`}.
-              This action cannot be undone.
+              {t("delete.bulkDescription", { count: selectedIds.size })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
             <AlertDialogAction
               className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
               onClick={handleBulkDelete}
             >
-              Delete
+              {tCommon("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

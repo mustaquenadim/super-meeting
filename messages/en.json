@@ -1,4 +1,17 @@
 {
+  "common": {
+    "pagination": {
+      "showing": "Showing {start} to {end} of {total} {label}",
+      "rowsPerPage": "Rows per page",
+      "page": "Page",
+      "of": "of {total}",
+      "first": "Go to first page",
+      "previous": "Go to previous page",
+      "next": "Go to next page",
+      "last": "Go to last page",
+      "items": "items"
+    }
+  },
   "sidebar": {
     "logoAlt": "Super Office Logo",
     "group": {
@@ -104,6 +117,7 @@
   },
   "rooms": {
     "title": "Rooms",
+    "roomsLabel": "{count, plural, one {room} other {rooms}}",
     "description": "Manage rooms across your locations",
     "addRoom": "Add Room",
     "addNewRoom": "Add New Room",
@@ -128,6 +142,11 @@
     "delete": "Delete",
     "deleteTitle": "Delete room?",
     "deleteDescription": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+    "delete": {
+      "aboutToDelete": "You are about to delete:",
+      "bulkTitle": "Delete {count} {count, plural, one {room} other {rooms}}?",
+      "bulkDescription": "This will permanently delete the selected {count} {count, plural, one {room} other {rooms}}. This action cannot be undone."
+    },
     "table": {
       "name": "Name",
       "location": "Location",
@@ -180,6 +199,7 @@
       "title": "Room Amenities",
       "description": "Manage room amenities and equipment.",
       "addAmenity": "Add Amenity",
+      "equipmentLabel": "{count, plural, one {item} other {items}}",
       "toolbar": {
         "searchPlaceholder": "Search amenities..."
       },
@@ -220,7 +240,7 @@
         },
         "delete": {
           "title": "Delete Amenity",
-          "description": "Are you sure you want to delete \"{name}\"?",
+          "description": "Are you sure you want to delete",
           "fallbackName": "this amenity"
         },
         "bulkDelete": {
@@ -250,6 +270,7 @@
       "title": "Room Categories",
       "description": "Manage room categories for organizing your spaces.",
       "addCategory": "Add Category",
+      "categoryLabel": "{count, plural, one {category} other {categories}}",
       "toolbar": {
         "searchPlaceholder": "Search categories..."
       },
