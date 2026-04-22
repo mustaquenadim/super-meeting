@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -42,6 +43,7 @@ export default function LocationForm({
   onSubmit,
   isSubmitting,
 }: LocationFormProps) {
+  const t = useTranslations("locations");
   const update = (key: keyof LocationFormData, value: string) =>
     setFormData((prev) => ({ ...prev, [key]: value }));
 
@@ -50,76 +52,76 @@ export default function LocationForm({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {mode === "add" ? "Add Location" : "Edit Location"}
+            {mode === "add" ? t("addLocation") : t("editLocation")}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">{t("form.name")}</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => update("name", e.target.value)}
-              placeholder="Location name"
+              placeholder={t("form.namePlaceholder")}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="address">Address</Label>
+            <Label htmlFor="address">{t("form.address")}</Label>
             <Input
               id="address"
               value={formData.address}
               onChange={(e) => update("address", e.target.value)}
-              placeholder="Full address"
+              placeholder={t("form.addressPlaceholder")}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
+            <Label htmlFor="phone">{t("form.phone")}</Label>
             <Input
               id="phone"
               type="tel"
               value={formData.phone}
               onChange={(e) => update("phone", e.target.value)}
-              placeholder="Phone number"
+              placeholder={t("form.phonePlaceholder")}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("form.email")}</Label>
             <Input
               id="email"
               type="email"
               value={formData.email}
               onChange={(e) => update("email", e.target.value)}
-              placeholder="Email address"
+              placeholder={t("form.emailPlaceholder")}
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="latitude">Latitude</Label>
+              <Label htmlFor="latitude">{t("form.latitude")}</Label>
               <Input
                 id="latitude"
                 value={formData.latitude}
                 onChange={(e) => update("latitude", e.target.value)}
-                placeholder="Latitude"
+                placeholder={t("form.latitude")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="longitude">Longitude</Label>
+              <Label htmlFor="longitude">{t("form.longitude")}</Label>
               <Input
                 id="longitude"
                 value={formData.longitude}
                 onChange={(e) => update("longitude", e.target.value)}
-                placeholder="Longitude"
+                placeholder={t("form.longitude")}
               />
             </div>
           </div>
           <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
             <div className="space-y-0.5">
-              <Label htmlFor="status">Status</Label>
+              <Label htmlFor="status">{t("status")}</Label>
               <p className="text-sm text-muted-foreground">
                 {formData.status === "active"
-                  ? "Location is active and visible"
-                  : "Location is inactive and hidden"}
+                  ? t("form.statusDescriptionActive")
+                  : t("form.statusDescriptionInactive")}
               </p>
             </div>
             <Switch
@@ -136,10 +138,10 @@ export default function LocationForm({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : mode === "add" ? "Add" : "Save"}
+              {isSubmitting ? t("saving") : mode === "add" ? t("add") : t("save")}
             </Button>
           </DialogFooter>
         </form>

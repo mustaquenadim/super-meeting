@@ -30,6 +30,7 @@ import {
   Users,
 } from "lucide-react"
 
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -90,21 +91,6 @@ type LocationColumnKey =
   | "status"
   | "actions"
 
-const LOCATION_COLUMNS: Record<LocationColumnKey, ColumnDefinition> = {
-  name: { label: "Location Name", sortable: true, defaultVisible: true },
-  address: { label: "Address", sortable: true, defaultVisible: true },
-  contact: { label: "Contact", sortable: false, defaultVisible: true },
-  rooms: { label: "Rooms", sortable: true, defaultVisible: true },
-  capacity: { label: "Capacity", sortable: true, defaultVisible: true },
-  status: { label: "Status", sortable: true, defaultVisible: true },
-  actions: {
-    label: "Actions",
-    sortable: false,
-    defaultVisible: true,
-    hideable: false,
-  },
-}
-
 const DEFAULT_COLUMN_ORDER: LocationColumnKey[] = [
   "name",
   "address",
@@ -135,6 +121,23 @@ function getSortVal(location: Location, col: LocationColumnKey): string {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function LocationManagementPage() {
+  const t = useTranslations("locations")
+
+  const LOCATION_COLUMNS: Record<LocationColumnKey, ColumnDefinition> = React.useMemo(() => ({
+    name: { label: t("table.name"), sortable: true, defaultVisible: true },
+    address: { label: t("table.address"), sortable: true, defaultVisible: true },
+    contact: { label: t("table.contact"), sortable: false, defaultVisible: true },
+    rooms: { label: t("table.rooms"), sortable: true, defaultVisible: true },
+    capacity: { label: t("table.capacity"), sortable: true, defaultVisible: true },
+    status: { label: t("table.status"), sortable: true, defaultVisible: true },
+    actions: {
+      label: t("table.actions"),
+      sortable: false,
+      defaultVisible: true,
+      hideable: false,
+    },
+  }), [t])
+
   // Dialog state
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
@@ -287,12 +290,12 @@ export default function LocationManagementPage() {
     e.preventDefault()
     try {
       await createLocation.mutateAsync(formData as unknown as Partial<Location>)
-      toast.success("Location created")
+      toast.success(t("messages.created"))
     } catch (err: unknown) {
       toast.error(
         err instanceof Error
           ? err.message
-          : (err as { message?: string })?.message || "Failed to create"
+          : (err as { message?: string })?.message || t("messages.failedCreate")
       )
     } finally {
       setFormData({
@@ -330,12 +333,12 @@ export default function LocationManagementPage() {
         id: Number(selectedLocation.id),
         payload: formData as unknown as Partial<Location>,
       })
-      toast.success("Location updated")
+      toast.success(t("messages.updated"))
     } catch (err: unknown) {
       toast.error(
         err instanceof Error
           ? err.message
-          : (err as { message?: string })?.message || "Failed to update"
+          : (err as { message?: string })?.message || t("messages.failedUpdate")
       )
     } finally {
       setIsEditDialogOpen(false)
@@ -356,12 +359,12 @@ export default function LocationManagementPage() {
     if (!selectedLocation) return
     try {
       await deleteLocation.mutateAsync(Number(selectedLocation.id))
-      toast.success("Location deleted")
+      toast.success(t("messages.deleted"))
     } catch (err: unknown) {
       toast.error(
         err instanceof Error
           ? err.message
-          : (err as { message?: string })?.message || "Failed to delete"
+          : (err as { message?: string })?.message || t("messages.failedDelete")
       )
     } finally {
       setIsDeleteDialogOpen(false)
@@ -376,11 +379,9 @@ export default function LocationManagementPage() {
     )
     const failed = results.filter((r) => r.status === "rejected").length
     if (failed === 0) {
-      toast.success(
-        `${ids.length} location${ids.length > 1 ? "s" : ""} deleted.`
-      )
+      toast.success(t("messages.bulkDeleted", { count: ids.length }))
     } else {
-      toast.error(`${failed} deletion${failed > 1 ? "s" : ""} failed.`)
+      toast.error(t("messages.failedBulkDelete", { count: failed }))
     }
     clearSelection()
     setIsBulkDeleteDialogOpen(false)
@@ -399,10 +400,13 @@ export default function LocationManagementPage() {
     const failed = results.filter((r) => r.status === "rejected").length
     if (failed === 0) {
       toast.success(
-        `${ids.length} location${ids.length > 1 ? "s" : ""} marked as ${status}.`
+        t("messages.bulkUpdated", {
+          count: ids.length,
+          status: status === "active" ? t("statusActive") : t("statusInactive"),
+        })
       )
     } else {
-      toast.error(`${failed} update${failed > 1 ? "s" : ""} failed.`)
+      toast.error(t("messages.failedBulkUpdate", { count: failed }))
     }
     clearSelection()
   }
@@ -465,8 +469,7 @@ export default function LocationManagementPage() {
             <div className="flex items-center gap-2">
               <DoorOpen className="h-4 w-4 shrink-0 text-muted-foreground" />
               <span className="text-sm">
-                {location.roomsCount ?? 0} room
-                {(location.roomsCount ?? 0) !== 1 ? "s" : ""}
+                {t("roomsCount", { count: location.roomsCount ?? 0 })}
               </span>
             </div>
           </DraggableTableCell>
@@ -476,7 +479,9 @@ export default function LocationManagementPage() {
           <DraggableTableCell key={col} columnKey={col}>
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
-              <span className="text-sm">{location.capacity ?? 0} people</span>
+              <span className="text-sm">
+                {t("peopleCount", { count: location.capacity ?? 0 })}
+              </span>
             </div>
           </DraggableTableCell>
         )
@@ -486,7 +491,7 @@ export default function LocationManagementPage() {
             <Badge
               variant={location.status === "active" ? "default" : "secondary"}
             >
-              {location.status === "active" ? "Active" : "Inactive"}
+              {location.status === "active" ? t("statusActive") : t("statusInactive")}
             </Badge>
           </DraggableTableCell>
         )
@@ -499,14 +504,14 @@ export default function LocationManagementPage() {
                 size="sm"
                 onClick={() => handleEdit(location)}
               >
-                Edit
+                {t("edit")}
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleView(location)}
               >
-                View
+                {t("viewLocation")}
               </Button>
               <Button
                 variant="destructive"
@@ -518,7 +523,7 @@ export default function LocationManagementPage() {
                 disabled={deleteLocation.status === "pending"}
               >
                 <Trash2 className="me-2 h-4 w-4" />
-                Delete
+                {t("delete")}
               </Button>
             </div>
           </DraggableTableCell>
@@ -533,14 +538,14 @@ export default function LocationManagementPage() {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Locations</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
           <p className="text-muted-foreground">
-            Manage your locations and branches
+            {t("description")}
           </p>
         </div>
         <Button onClick={() => setIsDialogOpen(true)}>
           <Plus className="me-2 h-4 w-4" />
-          Add Location
+          {t("addLocation")}
         </Button>
       </div>
 
@@ -553,7 +558,7 @@ export default function LocationManagementPage() {
               <div className="relative max-w-sm flex-1">
                 <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Search locations..."
+                  placeholder={t("searchPlaceholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
@@ -566,7 +571,7 @@ export default function LocationManagementPage() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
                       <Filter className="h-4 w-4" />
-                      <span className="hidden lg:inline">Filters</span>
+                      <span className="hidden lg:inline">{t("filters")}</span>
                       {activeFilterCount > 0 && (
                         <Badge
                           variant="default"
@@ -584,7 +589,7 @@ export default function LocationManagementPage() {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center justify-between">
-                        <h3 className="font-semibold">Filters</h3>
+                        <h3 className="font-semibold">{t("filters")}</h3>
                         {activeFilterCount > 0 && (
                           <Button
                             variant="ghost"
@@ -596,14 +601,14 @@ export default function LocationManagementPage() {
                             className="h-7 text-xs"
                           >
                             <X className="mr-1 h-3 w-3" />
-                            Clear All
+                            {t("clearAll")}
                           </Button>
                         )}
                       </div>
 
                       {/* Status filter */}
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium">Status</Label>
+                        <Label className="text-sm font-medium">{t("status")}</Label>
                         <div className="flex flex-wrap gap-2">
                           {(["active", "inactive"] as const).map((s) => (
                             <Button
@@ -617,7 +622,7 @@ export default function LocationManagementPage() {
                                 setStatusFilter(statusFilter === s ? "all" : s)
                               }
                             >
-                              {s === "active" ? "Active" : "Inactive"}
+                              {s === "active" ? t("statusActive") : t("statusInactive")}
                             </Button>
                           ))}
                         </div>
@@ -632,9 +637,9 @@ export default function LocationManagementPage() {
                     <Button variant="outline" size="sm">
                       <Columns3Cog className="h-4 w-4" />
                       <span className="hidden lg:inline">
-                        Customize Columns
+                        {t("customizeColumns")}
                       </span>
-                      <span className="lg:hidden">Columns</span>
+                      <span className="lg:hidden">{t("columns")}</span>
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -659,11 +664,11 @@ export default function LocationManagementPage() {
             {activeFilterCount > 0 && (
               <div className="flex min-w-0 flex-wrap items-center gap-2">
                 <span className="text-xs text-muted-foreground">
-                  Active filters:
+                  {t("activeFilters")}
                 </span>
                 {statusFilter !== "all" && (
                   <Badge variant="secondary" className="text-xs">
-                    Status: {statusFilter === "active" ? "Active" : "Inactive"}
+                    {t("status")}: {statusFilter === "active" ? t("statusActive") : t("statusInactive")}
                     <button
                       onClick={() => setStatusFilter("all")}
                       className="ml-1 rounded-full p-0.5 hover:bg-destructive/20"
@@ -681,14 +686,13 @@ export default function LocationManagementPage() {
             <div className="flex items-center justify-between border-b bg-muted/50 px-4 py-3">
               <div className="flex items-center gap-3">
                 <Badge variant="secondary" className="text-sm font-medium">
-                  {selectedIds.size}{" "}
-                  {selectedIds.size === 1 ? "location" : "locations"} selected
+                  {t("bulkSelected", { count: selectedIds.size })}
                 </Badge>
                 <button
                   onClick={clearSelection}
                   className="text-xs text-muted-foreground hover:text-foreground"
                 >
-                  Clear
+                  {t("clear")}
                 </button>
               </div>
               <div className="flex items-center gap-2">
@@ -696,7 +700,7 @@ export default function LocationManagementPage() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
                       <CheckCircle2 className="mr-2 h-4 w-4" />
-                      Change Status
+                      {t("changeStatus")}
                       <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -705,14 +709,14 @@ export default function LocationManagementPage() {
                       onClick={() => handleBulkStatusChange("active")}
                     >
                       <CheckCircle2 className="mr-2 h-4 w-4 text-green-600" />
-                      Activate
+                      {t("activate")}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => handleBulkStatusChange("inactive")}
                     >
                       <XCircle className="mr-2 h-4 w-4 text-muted-foreground" />
-                      Deactivate
+                      {t("deactivate")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -722,7 +726,7 @@ export default function LocationManagementPage() {
                   onClick={() => setIsBulkDeleteDialogOpen(true)}
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
+                  {t("delete")}
                 </Button>
               </div>
             </div>
@@ -779,7 +783,7 @@ export default function LocationManagementPage() {
                         className="py-8 text-center"
                       >
                         <p className="text-muted-foreground">
-                          No results found
+                          {t("noResults")}
                         </p>
                       </TableCell>
                     </TableRow>

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { MapPin, Phone, Mail } from "lucide-react";
 import {
   Dialog,
@@ -26,6 +27,7 @@ export default function LocationViewDialog({
   location,
   onEdit,
 }: LocationViewDialogProps) {
+  const t = useTranslations("locations");
   if (!location) return null;
 
   return (
@@ -56,25 +58,28 @@ export default function LocationViewDialog({
           {(location.latitude || location.longitude) && (
             <div className="text-sm text-muted-foreground">
               {location.latitude && location.longitude
-                ? `Coordinates: ${location.latitude}, ${location.longitude}`
+                ? t("coordinates", {
+                    lat: location.latitude,
+                    lng: location.longitude,
+                  })
                 : location.latitude
-                  ? `Lat: ${location.latitude}`
-                  : `Lng: ${location.longitude}`}
+                  ? t("latitudeLabel", { lat: location.latitude })
+                  : t("longitudeLabel", { lng: location.longitude ?? "" })}
             </div>
           )}
           <div>
             <Badge
               variant={location.status === "active" ? "default" : "secondary"}
             >
-              {location.status === "active" ? "Active" : "Inactive"}
+              {location.status === "active" ? t("statusActive") : t("statusInactive")}
             </Badge>
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Close
+            {t("close")}
           </Button>
-          <Button onClick={() => onEdit(location)}>Edit</Button>
+          <Button onClick={() => onEdit(location)}>{t("edit")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,26 +29,26 @@ export default function LocationDeleteDialog({
   onDelete,
   isDeleting,
 }: LocationDeleteDialogProps) {
+  const t = useTranslations("locations");
   if (!location) return null;
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete location?</AlertDialogTitle>
+          <AlertDialogTitle>{t("deleteTitle")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete &quot;{location.name}&quot;? This
-            action cannot be undone.
+            {t("deleteDescription", { name: location.name })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
           <AlertDialogAction
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             onClick={onDelete}
             disabled={isDeleting}
           >
-            {isDeleting ? "Deleting..." : "Delete"}
+            {isDeleting ? t("deleting") : t("delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
