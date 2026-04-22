@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +26,7 @@ export function ViewRoomDialog({
   room,
   onEdit,
 }: ViewRoomDialogProps) {
+  const t = useTranslations("rooms");
   if (!room) return null;
 
   const doorsList =
@@ -42,46 +44,46 @@ export function ViewRoomDialog({
           {room.branch?.name && (
             <div>
               <p className="text-xs font-medium text-muted-foreground">
-                Location
+                {t("form.branch")}
               </p>
               <p className="text-sm">{room.branch.name}</p>
             </div>
           )}
           <div>
-            <p className="text-xs font-medium text-muted-foreground">Doors</p>
+            <p className="text-xs font-medium text-muted-foreground">{t("form.doors")}</p>
             <p className="text-sm">{doorsList}</p>
           </div>
           {room.capacity != null && (
             <div>
               <p className="text-xs font-medium text-muted-foreground">
-                Capacity
+                {t("form.capacity")}
               </p>
-              <p className="text-sm">{room.capacity} people</p>
+              <p className="text-sm">{t("peopleCount", { count: room.capacity })}</p>
             </div>
           )}
           {room.type && (
             <div>
               <p className="text-xs font-medium text-muted-foreground">
-                Category
+                {t("table.category")}
               </p>
               <p className="text-sm">{room.type}</p>
             </div>
           )}
           <div>
-            <p className="text-xs font-medium text-muted-foreground">Status</p>
+            <p className="text-xs font-medium text-muted-foreground">{t("status")}</p>
             <Badge
               className="capitalize"
               variant={room.status === "available" ? "default" : "secondary"}
             >
-              {room.status}
+              {room.status === "available" ? t("available") : t("unavailable")}
             </Badge>
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Close
+            {t("close")}
           </Button>
-          <Button onClick={() => onEdit(room)}>Edit</Button>
+          <Button onClick={() => onEdit(room)}>{t("editRoom")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

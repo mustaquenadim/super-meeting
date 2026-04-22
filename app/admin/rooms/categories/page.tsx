@@ -23,6 +23,7 @@ import {
   X,
   Columns3Cog,
 } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -98,18 +99,6 @@ type Category = {
 
 type CategoryColumnKey = "name" | "description" | "rooms" | "status" | "actions"
 
-const CATEGORY_COLUMNS: Record<CategoryColumnKey, ColumnDefinition> = {
-  name: { label: "Category Name", sortable: true, defaultVisible: true },
-  description: { label: "Description", sortable: true, defaultVisible: true },
-  rooms: { label: "Rooms", sortable: true, defaultVisible: true },
-  status: { label: "Status", sortable: true, defaultVisible: true },
-  actions: {
-    label: "Actions",
-    sortable: false,
-    defaultVisible: true,
-    hideable: false,
-  },
-}
 
 const DEFAULT_COLUMN_ORDER: CategoryColumnKey[] = [
   "name",
@@ -119,58 +108,6 @@ const DEFAULT_COLUMN_ORDER: CategoryColumnKey[] = [
   "actions",
 ]
 
-const t = (key: string, values?: Record<string, string | number>) => {
-  if (key === "table.roomsCount" && values?.count !== undefined) {
-    return `${values.count} room(s)`
-  }
-  const map: Record<string, string> = {
-    title: "Room Categories",
-    description: "Manage room categories for organizing your spaces.",
-    addCategory: "Add Category",
-    "toasts.created": "Category created successfully.",
-    "toasts.failedCreate": "Failed to create category.",
-    "toasts.deleted": "Category deleted successfully.",
-    "toasts.failedDelete": "Failed to delete category.",
-    "form.categoryName": "Category Name",
-    "form.enterCategoryName": "Enter category name",
-    "form.description": "Description",
-    "form.enterCategoryDescription": "Enter description",
-    "table.categoryName": "Category Name",
-    "table.description": "Description",
-    "table.rooms": "Rooms",
-    "table.roomsCount": "0 room(s)",
-    "dialogs.add.title": "Add Category",
-    "dialogs.add.description": "Create a new room category.",
-    "dialogs.edit.title": "Edit Category",
-    "dialogs.edit.description": "Update the category details.",
-    "dialogs.view.title": "View Category",
-    "dialogs.view.description": "Category details.",
-    "dialogs.delete.title": "Delete Category",
-    "dialogs.delete.description":
-      "Are you sure you want to delete this category?",
-    "dialogs.delete.aboutToDelete":
-      "You are about to delete the following category:",
-    "buttons.updateCategory": "Update Category",
-    "buttons.close": "Close",
-    "buttons.editCategory": "Edit Category",
-  }
-  return map[key] ?? key
-}
-
-const tCommon = (key: string) => {
-  const map: Record<string, string> = {
-    active: "Active",
-    inactive: "Inactive",
-    status: "Status",
-    edit: "Edit",
-    view: "View",
-    delete: "Delete",
-    cancel: "Cancel",
-    actions: "Actions",
-    noResults: "No results found.",
-  }
-  return map[key] ?? key
-}
 
 function getCategorySortVal(
   category: Category,
@@ -191,6 +128,41 @@ function getCategorySortVal(
 }
 
 export default function RoomCategoriesPage() {
+  const t = useTranslations("rooms.categories")
+  const tCommon = useTranslations("rooms.common")
+
+  const CATEGORY_COLUMNS: Record<CategoryColumnKey, ColumnDefinition> =
+    React.useMemo(
+      () => ({
+        name: {
+          label: t("table.name"),
+          sortable: true,
+          defaultVisible: true,
+        },
+        description: {
+          label: t("table.description"),
+          sortable: true,
+          defaultVisible: true,
+        },
+        rooms: {
+          label: t("table.rooms"),
+          sortable: true,
+          defaultVisible: true,
+        },
+        status: {
+          label: tCommon("status"),
+          sortable: true,
+          defaultVisible: true,
+        },
+        actions: {
+          label: tCommon("actions"),
+          sortable: false,
+          defaultVisible: true,
+          hideable: false,
+        },
+      }),
+      [t, tCommon]
+    )
   const { data: categoriesData, isLoading: categoriesLoading } =
     useRoomCategories(1, 200)
   const createCategory = useCreateRoomCategory()
@@ -262,10 +234,10 @@ export default function RoomCategoriesPage() {
         description: formData.description,
         status: formData.status,
       } as Partial<ApiRoomCategory>)
-      toast.success(t("toasts.created"))
+      toast.success(t("messages.created"))
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : t("toasts.failedCreate")
+        err instanceof Error ? err.message : t("messages.failedCreate")
       toast.error(errorMessage)
     } finally {
       setFormData({
@@ -310,10 +282,10 @@ export default function RoomCategoriesPage() {
     if (!selectedCategory) return
     try {
       await deleteCategory.mutateAsync(String(selectedCategory.id))
-      toast.success(t("toasts.deleted"))
+      toast.success(t("messages.deleted"))
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : t("toasts.failedDelete")
+        err instanceof Error ? err.message : t("messages.failedDelete")
       toast.error(errorMessage)
     } finally {
       setIsDeleteDialogOpen(false)
@@ -388,13 +360,9 @@ export default function RoomCategoriesPage() {
     const failed = results.filter((result) => result.status === "rejected")
 
     if (failed.length === 0) {
-      toast.success(
-        `${ids.length} ${ids.length === 1 ? "category" : "categories"} deleted.`
-      )
+      toast.success(t("messages.bulkDeleted", { count: ids.length }))
     } else {
-      toast.error(
-        `${failed.length} deletion${failed.length > 1 ? "s" : ""} failed.`
-      )
+      toast.error(t("messages.bulkDeleteFailed", { count: failed.length }))
     }
 
     clearSelection()
@@ -603,7 +571,7 @@ export default function RoomCategoriesPage() {
             {activeFilterCount > 0 && (
               <div className="flex min-w-0 flex-wrap items-center gap-2">
                 <span className="text-xs text-muted-foreground">
-                  Active filters:
+                  {tCommon("activeFilters")}
                 </span>
                 {statusFilter !== "all" && (
                   <Badge variant="secondary" className="text-xs">
@@ -627,13 +595,13 @@ export default function RoomCategoriesPage() {
             <div className="flex items-center justify-between border-b bg-muted/50 px-4 py-3">
               <div className="flex items-center gap-3">
                 <Badge variant="secondary" className="text-sm font-medium">
-                  {selectedIds.size} selected
+                  {tCommon("selectedCount", { count: selectedIds.size })}
                 </Badge>
                 <button
                   onClick={clearSelection}
                   className="text-xs text-muted-foreground hover:text-foreground"
                 >
-                  Clear
+                  {tCommon("clear")}
                 </button>
               </div>
               <div className="flex items-center gap-2">
@@ -774,15 +742,10 @@ export default function RoomCategoriesPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Delete {selectedIds.size} categor
-              {selectedIds.size > 1 ? "ies" : "y"}?
+              {t("dialogs.bulkDelete.title", { count: selectedIds.size })}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the selected{" "}
-              {selectedIds.size === 1
-                ? "category"
-                : `${selectedIds.size} categories`}
-              . This action cannot be undone.
+              {t("dialogs.bulkDelete.description", { count: selectedIds.size })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

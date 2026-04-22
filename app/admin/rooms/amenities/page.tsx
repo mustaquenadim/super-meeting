@@ -24,6 +24,7 @@ import {
   CheckCircle2,
   XCircle,
 } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -155,117 +156,38 @@ const equipmentTypes = [
   "other",
 ]
 
-const t = (key: string, values?: Record<string, string | number>) => {
-  if (key === "table.roomsCount" && values?.count !== undefined) {
-    return `${values.count} room(s)`
-  }
-  if (key === "toolbar.selectedCount" && values?.count !== undefined) {
-    return `${values.count} selected`
-  }
-  if (key === "toasts.bulkDeleted" && values?.count !== undefined) {
-    return `${values.count} item(s) deleted successfully.`
-  }
-  if (key === "toasts.bulkDeleteFailed" && values?.count !== undefined) {
-    return `${values.count} deletion(s) failed.`
-  }
-  if (
-    key === "toasts.bulkStatusUpdated" &&
-    values?.count !== undefined &&
-    values?.status
-  ) {
-    return `${values.count} item(s) set to ${values.status}.`
-  }
-  if (key === "toasts.bulkStatusFailed" && values?.count !== undefined) {
-    return `${values.count} status update(s) failed.`
-  }
-  if (key === "dialogs.bulkDelete.title" && values?.count !== undefined) {
-    return `Delete ${values.count} item(s)?`
-  }
-  if (key === "dialogs.bulkDelete.description" && values?.count !== undefined) {
-    return `This will permanently delete ${values.count} selected item(s). This action cannot be undone.`
-  }
-  const map: Record<string, string> = {
-    title: "Room Amenities",
-    description: "Manage room amenities and equipment.",
-    addEquipment: "Add Amenity",
-    "toasts.created": "Amenity created successfully.",
-    "toasts.failedCreate": "Failed to create amenity.",
-    "toasts.updated": "Amenity updated successfully.",
-    "toasts.failedUpdate": "Failed to update amenity.",
-    "toasts.deleted": "Amenity deleted successfully.",
-    "toasts.failedDelete": "Failed to delete amenity.",
-    "table.equipment": "Equipment",
-    "table.type": "Type",
-    "table.description": "Description",
-    "table.rooms": "Rooms",
-    "table.roomsCount": "0 room(s)",
-    "toolbar.searchPlaceholder": "Search amenities...",
-    "toolbar.filters": "Filters",
-    "toolbar.clearAll": "Clear All",
-    "toolbar.customizeColumns": "Customize Columns",
-    "toolbar.columns": "Columns",
-    "toolbar.activeFilters": "Active filters:",
-    "toolbar.clear": "Clear",
-    "toolbar.changeStatus": "Change Status",
-    "toolbar.activate": "Activate",
-    "toolbar.deactivate": "Deactivate",
-    "form.equipmentName": "Equipment Name",
-    "form.enterEquipmentName": "Enter equipment name",
-    "form.description": "Description",
-    "form.enterEquipmentDescription": "Enter description",
-    "form.selectType": "Select type",
-    "dialogs.add.title": "Add Amenity",
-    "dialogs.add.description": "Create a new room amenity.",
-    "dialogs.edit.title": "Edit Amenity",
-    "dialogs.edit.description": "Update the amenity details.",
-    "dialogs.view.title": "View Amenity",
-    "dialogs.view.description": "Amenity details.",
-    "dialogs.delete.title": "Delete Amenity",
-    "dialogs.delete.description": "Are you sure you want to delete",
-    "dialogs.delete.fallbackName": "this amenity",
-    "buttons.updateEquipment": "Update Amenity",
-    "buttons.close": "Close",
-    "buttons.editEquipment": "Edit Amenity",
-    "types.av-equipment": "AV Equipment",
-    "types.furniture": "Furniture",
-    "types.communication": "Communication",
-    "types.network": "Network",
-    "types.amenity": "Amenity",
-    "types.other": "Other",
-  }
-  return map[key] ?? key
-}
 
-const tCommon = (key: string) => {
-  const map: Record<string, string> = {
-    active: "Active",
-    inactive: "Inactive",
-    status: "Status",
-    edit: "Edit",
-    view: "View",
-    delete: "Delete",
-    cancel: "Cancel",
-    actions: "Actions",
-    noResults: "No results found.",
-  }
-  return map[key] ?? key
-}
-
-const EQUIPMENT_COLUMNS: Record<EquipmentColumnKey, ColumnDefinition> = {
-  equipment: { label: "Equipment", sortable: true, defaultVisible: true },
-  type: { label: "Type", sortable: true, defaultVisible: true },
-  description: { label: "Description", sortable: true, defaultVisible: true },
-  rooms: { label: "Rooms", sortable: true, defaultVisible: true },
-  status: { label: "Status", sortable: true, defaultVisible: true },
-  actions: {
-    label: "Actions",
-    sortable: false,
-    defaultVisible: true,
-    hideable: false,
-  },
-}
 
 export default function RoomAmenitiesPage() {
+  const t = useTranslations("rooms.amenities")
+  const tCommon = useTranslations("rooms.common")
+
+
+  const EQUIPMENT_COLUMNS: Record<EquipmentColumnKey, ColumnDefinition> =
+    React.useMemo(
+      () => ({
+        equipment: {
+          label: t("table.equipment"),
+          sortable: true,
+          defaultVisible: true,
+        },
+        type: { label: t("table.type"), sortable: true, defaultVisible: true },
+        description: {
+          label: t("table.description"),
+          sortable: true,
+          defaultVisible: true,
+        },
+        rooms: { label: t("table.rooms"), sortable: true, defaultVisible: true },
+        status: { label: tCommon("status"), sortable: true, defaultVisible: true },
+        actions: {
+          label: tCommon("actions"),
+          sortable: false,
+          defaultVisible: true,
+          hideable: false,
+        },
+      }),
+      [t, tCommon]
+    )
   const { data: equipmentData, isLoading: equipmentLoading } = useAmenities(
     1,
     200
@@ -350,10 +272,10 @@ export default function RoomAmenitiesPage() {
         type: formData.type,
         status: formData.status,
       })
-      toast.success(t("toasts.created"))
+      toast.success(t("messages.created"))
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : null
-      toast.error(message ?? t("toasts.failedCreate"))
+      toast.error(message ?? t("messages.failedCreate"))
     } finally {
       setFormData({
         name: "",
@@ -390,10 +312,10 @@ export default function RoomAmenitiesPage() {
           status: formData.status,
         },
       })
-      toast.success(t("toasts.updated"))
+      toast.success(t("messages.updated"))
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : t("toasts.failedUpdate")
+        err instanceof Error ? err.message : t("messages.failedUpdate")
       toast.error(message)
       return
     }
@@ -479,10 +401,10 @@ export default function RoomAmenitiesPage() {
 
     try {
       await deleteAmenity.mutateAsync(Number(selectedEquipment.id))
-      toast.success(t("toasts.deleted"))
+      toast.success(t("messages.deleted"))
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : t("toasts.failedDelete")
+        err instanceof Error ? err.message : t("messages.failedDelete")
       toast.error(message)
     } finally {
       setIsDeleteDialogOpen(false)
@@ -500,9 +422,9 @@ export default function RoomAmenitiesPage() {
     ).length
 
     if (failed === 0) {
-      toast.success(t("toasts.bulkDeleted", { count: ids.length }))
+      toast.success(t("messages.bulkDeleted", { count: ids.length }))
     } else {
-      toast.error(t("toasts.bulkDeleteFailed", { count: failed }))
+      toast.error(t("messages.bulkDeleteFailed", { count: failed }))
     }
 
     clearSelection()
@@ -525,10 +447,13 @@ export default function RoomAmenitiesPage() {
 
     if (failed === 0) {
       toast.success(
-        t("toasts.bulkStatusUpdated", { count: ids.length, status })
+        t("messages.bulkStatusUpdated", {
+          count: ids.length,
+          status: status === "active" ? tCommon("active") : tCommon("inactive"),
+        })
       )
     } else {
-      toast.error(t("toasts.bulkStatusFailed", { count: failed }))
+      toast.error(t("messages.bulkStatusFailed", { count: failed }))
     }
 
     clearSelection()
@@ -621,7 +546,7 @@ export default function RoomAmenitiesPage() {
         </div>
         <Button onClick={() => setIsDialogOpen(true)}>
           <Plus className="me-2 h-4 w-4" />
-          {t("addEquipment")}
+          {t("addAmenity")}
         </Button>
       </div>
 
@@ -768,7 +693,7 @@ export default function RoomAmenitiesPage() {
             <div className="flex items-center justify-between border-b bg-muted/50 px-4 py-3">
               <div className="flex items-center gap-3">
                 <Badge variant="secondary" className="text-sm font-medium">
-                  {t("toolbar.selectedCount", { count: selectedIds.size })}
+                  {tCommon("selectedCount", { count: selectedIds.size })}
                 </Badge>
                 <button
                   onClick={clearSelection}

@@ -101,5 +101,203 @@
       "failedBulkDelete": "فشل حذف {count} {count, plural, one {عنصر} other {عناصر}}.",
       "failedBulkUpdate": "فشل تحديث {count} {count, plural, one {عنصر} other {عناصر}}."
     }
+  },
+  "rooms": {
+    "title": "الغرف",
+    "description": "إدارة الغرف في مواقعك",
+    "addRoom": "إضافة غرفة",
+    "addNewRoom": "إضافة غرفة جديدة",
+    "editRoom": "تعديل الغرفة",
+    "viewRoom": "عرض الغرفة",
+    "saveChanges": "حفظ التغييرات",
+    "searchPlaceholder": "البحث عن غرف...",
+    "noRoomsFound": "لم يتم العثور على غرف",
+    "filters": "الفلاتر",
+    "clearAll": "مسح الكل",
+    "activeFilters": "الفلاتر النشطة:",
+    "status": "الحالة",
+    "available": "متاح",
+    "unavailable": "غير متاح",
+    "customizeColumns": "تخصيص الأعمدة",
+    "columns": "الأعمدة",
+    "bulkSelected": "تم اختيار {count} {count, plural, one {غرفة} other {غرف}}",
+    "clear": "مسح",
+    "changeStatus": "تغيير الحالة",
+    "activate": "تفعيل",
+    "deactivate": "تعطيل",
+    "delete": "حذف",
+    "deleteTitle": "حذف الغرفة؟",
+    "deleteDescription": "هل أنت متأكد أنك تريد حذف \"{name}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+    "table": {
+      "name": "الاسم",
+      "location": "الموقع",
+      "doors": "الأبواب",
+      "category": "الفئة",
+      "capacity": "السعة",
+      "status": "الحالة",
+      "actions": "الإجراءات"
+    },
+    "form": {
+      "roomName": "اسم الغرفة",
+      "enterRoomName": "أدخل اسم الغرفة",
+      "branch": "الفرع",
+      "selectBranch": "اختر الفرع",
+      "doors": "الأبواب",
+      "selectDoors": "اختر الأبواب",
+      "noDoorsAvailable": "لا توجد أبواب متاحة.",
+      "noDoorsMatch": "لا توجد أبواب مطابقة",
+      "capacity": "السعة",
+      "enterCapacity": "أدخل السعة",
+      "roomType": "نوع الغرفة",
+      "selectRoomType": "اختر نوع الغرفة",
+      "price": "السعر (ريال سعودي لكل ساعة)",
+      "description": "الوصف",
+      "enterRoomDescription": "أدخل وصف الغرفة",
+      "amenities": "المعدات والمرافق",
+      "noAmenitiesConfigured": "لا توجد مرافق مهيأة.",
+      "statusDescriptionAvailable": "متاح",
+      "statusDescriptionUnavailable": "غير متاح",
+      "addDescription": "املأ التفاصيل أدناه لإضافة غرفة اجتماعات جديدة.",
+      "editDescription": "قم بتحديث التفاصيل أدناه لحفظ التغييرات على هذه الغرفة."
+    },
+    "messages": {
+      "created": "تم إنشاء الغرفة",
+      "updated": "تم تحديث الغرفة",
+      "deleted": "تم حذف الغرفة",
+      "bulkDeleted": "تم حذف {count} {count, plural, one {غرفة} other {غرف}}.",
+      "bulkUpdated": "تم تحديث {count} {count, plural, one {غرفة} other {غرف}}.",
+      "failedCreate": "فشل الإنشاء",
+      "failedUpdate": "فشل التحديث",
+      "failedDelete": "فشل الحذف",
+      "failedBulkDelete": "فشل حذف {count} {count, plural, one {عنصر} other {عناصر}}.",
+      "failedBulkUpdate": "فشل تحديث {count} {count, plural, one {عنصر} other {عناصر}}."
+    },
+    "peopleCount": "{count} {count, plural, one {شخص} other {أشخاص}}",
+    "saving": "جاري الحفظ...",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "amenities": {
+      "title": "مرافق الغرف",
+      "description": "إدارة مرافق الغرف والمعدات.",
+      "addAmenity": "إضافة مرفق",
+      "table": {
+        "equipment": "المعدات",
+        "type": "النوع",
+        "description": "الوصف",
+        "rooms": "الغرف",
+        "roomsCount": "{count} {count, plural, one {غرفة} other {غرف}}"
+      },
+      "types": {
+        "av-equipment": "معدات سمعية وبصرية",
+        "furniture": "أثاث",
+        "communication": "اتصالات",
+        "network": "شبكة",
+        "amenity": "مرفق",
+        "other": "آخر"
+      },
+      "dialogs": {
+        "add": {
+          "title": "إضافة مرفق",
+          "description": "إنشاء مرفق غرفة جديد."
+        },
+        "edit": {
+          "title": "تعديل المرفق",
+          "description": "تحديث تفاصيل المرفق."
+        },
+        "view": {
+          "title": "عرض المرفق",
+          "description": "تفاصيل المرفق."
+        },
+        "delete": {
+          "title": "حذف المرفق",
+          "description": "هل أنت متأكد أنك تريد حذف \"{name}\"؟",
+          "fallbackName": "هذا المرفق"
+        },
+        "bulkDelete": {
+          "title": "حذف {count} {count, plural, one {عنصر} other {عناصر}}؟",
+          "description": "سيؤدي هذا إلى حذف {count} {count, plural, one {عنصر مختار} other {عناصر مختارة}} نهائياً. لا يمكن التراجع عن هذا الإجراء."
+        }
+      },
+      "messages": {
+        "created": "تم إنشاء المرفق بنجاح.",
+        "failedCreate": "فشل إنشاء المرفق.",
+        "updated": "تم تحديث المرفق بنجاح.",
+        "failedUpdate": "فشل تحديث المرفق.",
+        "deleted": "تم حذف المرفق بنجاح.",
+        "failedDelete": "فشل حذف المرفق.",
+        "bulkDeleted": "تم حذف {count} {count, plural, one {عنصر} other {عناصر}} بنجاح.",
+        "bulkDeleteFailed": "فشل حذف {count} {count, plural, one {عنصر} other {عناصر}}.",
+        "bulkStatusUpdated": "تم تعيين {count} {count, plural, one {عنصر} other {عناصر}} كـ {status}.",
+        "bulkStatusFailed": "فشل تحديث حالة {count} {count, plural, one {عنصر} other {عناصر}}."
+      },
+      "buttons": {
+        "update": "تحديث المرفق",
+        "edit": "تعديل المرفق",
+        "close": "إغلاق"
+      }
+    },
+    "categories": {
+      "title": "فئات الغرف",
+      "description": "إدارة فئات الغرف لتنظيم مساحاتك.",
+      "addCategory": "إضافة فئة",
+      "table": {
+        "name": "اسم الفئة",
+        "description": "الوصف",
+        "rooms": "الغرف",
+        "roomsCount": "{count} {count, plural, one {غرفة} other {غرف}}"
+      },
+      "dialogs": {
+        "add": {
+          "title": "إضافة فئة",
+          "description": "إنشاء فئة غرفة جديدة."
+        },
+        "edit": {
+          "title": "تعديل الفئة",
+          "description": "تحديث تفاصيل الفئة."
+        },
+        "view": {
+          "title": "عرض الفئة",
+          "description": "تفاصيل الفئة."
+        },
+        "delete": {
+          "title": "حذف الفئة",
+          "description": "هل أنت متأكد أنك تريد حذف هذه الفئة؟",
+          "aboutToDelete": "أنت على وشك حذف الفئة التالية:"
+        },
+        "bulkDelete": {
+          "title": "حذف {count} {count, plural, one {فئة} other {فئات}}؟",
+          "description": "سيؤدي هذا إلى حذف {count} {count, plural, one {فئة مختارة} other {فئات مختارة}} نهائياً. لا يمكن التراجع عن هذا الإجراء."
+        }
+      },
+      "messages": {
+        "created": "تم إنشاء الفئة بنجاح.",
+        "failedCreate": "فشل إنشاء الفئة.",
+        "updated": "تم تحديث الفئة بنجاح.",
+        "failedUpdate": "فشل تحديث الفئة.",
+        "deleted": "تم حذف الفئة بنجاح.",
+        "failedDelete": "فشل حذف الفئة.",
+        "bulkDeleted": "تم حذف {count} {count, plural, one {فئة} other {فئات}} بنجاح.",
+        "bulkDeleteFailed": "فشل حذف {count} {count, plural, one {فئة} other {فئات}}."
+      },
+      "buttons": {
+        "update": "تحديث الفئة",
+        "edit": "تعديل الفئة",
+        "close": "إغلاق"
+      }
+    },
+    "common": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "status": "الحالة",
+      "edit": "تعديل",
+      "view": "عرض",
+      "delete": "حذف",
+      "cancel": "إلغاء",
+      "actions": "الإجراءات",
+      "noResults": "لم يتم العثور على نتائج.",
+      "selectedCount": "تم اختيار {count}"
+    }
   }
 }
+
+

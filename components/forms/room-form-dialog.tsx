@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { XIcon } from "lucide-react"
 import {
   Dialog,
@@ -79,6 +80,7 @@ export function RoomFormDialog({
   amenities,
   isSubmitting,
 }: RoomFormDialogProps) {
+  const t = useTranslations("rooms")
   const [name, setName] = React.useState("")
   const [locationId, setLocationId] = React.useState<number | undefined>()
   const [selectedDoorIds, setSelectedDoorIds] = React.useState<Set<string>>(
@@ -212,12 +214,12 @@ export function RoomFormDialog({
       >
         <DialogHeader className="px-6 py-4">
           <DialogTitle className="text-xl font-semibold tracking-tight">
-            {isEdit ? "Edit Room" : "Add New Room"}
+            {isEdit ? t("editRoom") : t("addNewRoom")}
           </DialogTitle>
           <DialogDescription>
             {isEdit
-              ? "Update the details below to save changes to this room."
-              : "Fill in the details below to add a new conference room."}
+              ? t("form.editDescription")
+              : t("form.addDescription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -225,13 +227,13 @@ export function RoomFormDialog({
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-5">
             <div className="space-y-2">
               <Label htmlFor="room-name" className="font-medium">
-                Room Name
+                {t("form.roomName")}
               </Label>
               <Input
                 id="room-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter room name"
+                placeholder={t("form.enterRoomName")}
                 required
               />
             </div>
@@ -239,7 +241,7 @@ export function RoomFormDialog({
             <div className="grid gap-5 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="room-branch" className="font-medium">
-                  Branch
+                  {t("form.branch")}
                 </Label>
                 <Select
                   value={locationId?.toString() ?? ""}
@@ -248,7 +250,7 @@ export function RoomFormDialog({
                   }
                 >
                   <SelectTrigger id="room-branch" className="w-full">
-                    <SelectValue placeholder="Select branch" />
+                    <SelectValue placeholder={t("form.selectBranch")} />
                   </SelectTrigger>
                   <SelectContent>
                     {branches.map((b) => (
@@ -261,26 +263,26 @@ export function RoomFormDialog({
               </div>
 
               <div className="min-w-0 space-y-2">
-                <Label className="font-medium">Doors</Label>
+                <Label className="font-medium">{t("form.doors")}</Label>
                 {doorsError ? (
                   <p className="text-sm text-destructive">{doorsError}</p>
                 ) : doors.length === 0 ? (
                   <p className="text-sm text-muted-foreground">
-                    No doors available.
+                    {t("form.noDoorsAvailable")}
                   </p>
                 ) : (
                   <div className="space-y-2">
                     <MultipleSelector
                       commandProps={{
-                        label: "Select doors",
+                        label: t("form.selectDoors"),
                       }}
                       emptyIndicator={
-                        <p className="text-center text-sm">No doors match</p>
+                        <p className="text-center text-sm">{t("form.noDoorsMatch")}</p>
                       }
                       hideSelectedBadges
                       onChange={handleDoorsChange}
                       options={doorOptions}
-                      placeholder="Select doors"
+                      placeholder={t("form.selectDoors")}
                       value={selectedDoorOptions}
                     />
                     {selectedDoorOptions.length > 0 ? (
@@ -326,7 +328,7 @@ export function RoomFormDialog({
             <div className="grid gap-5 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="room-capacity" className="font-medium">
-                  Capacity
+                  {t("form.capacity")}
                 </Label>
                 <Input
                   id="room-capacity"
@@ -334,19 +336,19 @@ export function RoomFormDialog({
                   min={0}
                   value={capacity}
                   onChange={(e) => setCapacity(e.target.value)}
-                  placeholder="Enter capacity"
+                  placeholder={t("form.enterCapacity")}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="room-type" className="font-medium">
-                  Room Type
+                  {t("form.roomType")}
                 </Label>
                 <Select
                   value={categoryId}
                   onValueChange={(v) => setCategoryId(v ?? "")}
                 >
                   <SelectTrigger id="room-type" className="w-full">
-                    <SelectValue placeholder="Select room type" />
+                    <SelectValue placeholder={t("form.selectRoomType")} />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((c) => (
@@ -361,7 +363,7 @@ export function RoomFormDialog({
 
             <div className="space-y-2 sm:max-w-[50%]">
               <Label htmlFor="room-price" className="font-medium">
-                Price (SAR per hour)
+                {t("form.price")}
               </Label>
               <Input
                 id="room-price"
@@ -374,20 +376,20 @@ export function RoomFormDialog({
 
             <div className="space-y-2">
               <Label htmlFor="room-description" className="font-medium">
-                Description
+                {t("form.description")}
               </Label>
               <Textarea
                 id="room-description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Enter room description"
+                placeholder={t("form.enterRoomDescription")}
                 rows={4}
                 className="min-h-20 resize-y"
               />
             </div>
 
             <div className="space-y-2">
-              <Label className="font-medium">Equipment &amp; Amenities</Label>
+              <Label className="font-medium">{t("form.amenities")}</Label>
               <div
                 className={scrollPickClass}
                 role="group"
@@ -395,7 +397,7 @@ export function RoomFormDialog({
               >
                 {amenities.length === 0 ? (
                   <p className="px-1 py-2 text-sm text-muted-foreground">
-                    No amenities configured.
+                    {t("form.noAmenitiesConfigured")}
                   </p>
                 ) : (
                   amenities.map((a) => (
@@ -417,10 +419,10 @@ export function RoomFormDialog({
             <div className="flex w-full items-center justify-between gap-4 rounded-lg border-input">
               <div className="min-w-0 space-y-0.5">
                 <Label htmlFor="room-status" className="font-medium">
-                  Status
+                  {t("status")}
                 </Label>
                 <p className="text-sm text-muted-foreground">
-                  {status === "available" ? "Available" : "Unavailable"}
+                  {status === "available" ? t("available") : t("unavailable")}
                 </p>
               </div>
               <Switch
@@ -439,14 +441,14 @@ export function RoomFormDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting
-                ? "Saving..."
+                ? t("saving")
                 : isEdit
-                  ? "Save changes"
-                  : "Add room"}
+                  ? t("saveChanges")
+                  : t("addRoom")}
             </Button>
           </DialogFooter>
         </form>

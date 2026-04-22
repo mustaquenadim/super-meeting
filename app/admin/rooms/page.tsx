@@ -26,6 +26,7 @@ import {
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable"
 
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -94,6 +95,33 @@ import {
 import { ViewRoomDialog } from "./_components/view-room-dialog"
 
 export default function RoomsPage() {
+  const t = useTranslations("rooms")
+
+  const ROOM_COLUMNS: Record<RoomColumnKey, ColumnDefinition> = React.useMemo(
+    () => ({
+      name: { label: t("table.name"), sortable: true, defaultVisible: true },
+      branch: {
+        label: t("table.location"),
+        sortable: true,
+        defaultVisible: true,
+      },
+      doors: { label: t("table.doors"), sortable: true, defaultVisible: true },
+      type: { label: t("table.category"), sortable: true, defaultVisible: true },
+      capacity: {
+        label: t("table.capacity"),
+        sortable: true,
+        defaultVisible: true,
+      },
+      status: { label: t("table.status"), sortable: true, defaultVisible: true },
+      actions: {
+        label: t("table.actions"),
+        sortable: false,
+        defaultVisible: true,
+        hideable: false,
+      },
+    }),
+    [t]
+  )
   const { data: roomsData, isLoading: roomsLoading } = useRooms(1, 200)
   const { data: branchesData } = useBranches(1, 200)
   const { data: amenitiesData } = useAmenities(1, 200)
@@ -128,7 +156,7 @@ export default function RoomsPage() {
         price: payload.price,
         amenities: payload.amenities,
       })
-      toast.success("Room created")
+      toast.success(t("messages.created"))
       setIsDialogOpen(false)
     } catch (err: unknown) {
       const errorMessage =
@@ -136,7 +164,7 @@ export default function RoomsPage() {
           ? err.message
           : typeof err === "object" && err && "message" in err
             ? String((err as { message: unknown }).message)
-            : "Failed to create"
+            : t("messages.failedCreate")
       toast.error(errorMessage)
       throw err
     }
@@ -184,21 +212,6 @@ export default function RoomsPage() {
     | "capacity"
     | "status"
     | "actions"
-
-  const ROOM_COLUMNS: Record<RoomColumnKey, ColumnDefinition> = {
-    name: { label: "Name", sortable: true, defaultVisible: true },
-    branch: { label: "Location", sortable: true, defaultVisible: true },
-    doors: { label: "Doors", sortable: true, defaultVisible: true },
-    type: { label: "Category", sortable: true, defaultVisible: true },
-    capacity: { label: "Capacity", sortable: true, defaultVisible: true },
-    status: { label: "Status", sortable: true, defaultVisible: true },
-    actions: {
-      label: "Actions",
-      sortable: false,
-      defaultVisible: true,
-      hideable: false,
-    },
-  }
 
   const DEFAULT_COLUMN_ORDER: RoomColumnKey[] = [
     "name",
@@ -336,8 +349,8 @@ export default function RoomsPage() {
     )
     const failed = results.filter((r) => r.status === "rejected").length
     if (failed === 0)
-      toast.success(`${ids.length} room${ids.length > 1 ? "s" : ""} deleted.`)
-    else toast.error(`${failed} deletion${failed > 1 ? "s" : ""} failed.`)
+      toast.success(t("messages.bulkDeleted", { count: ids.length }))
+    else toast.error(t("messages.failedBulkDelete", { count: failed }))
     clearSelection()
     setIsBulkDeleteDialogOpen(false)
   }
@@ -354,8 +367,8 @@ export default function RoomsPage() {
     )
     const failed = results.filter((r) => r.status === "rejected").length
     if (failed === 0)
-      toast.success(`${ids.length} room${ids.length > 1 ? "s" : ""} updated.`)
-    else toast.error(`${failed} update${failed > 1 ? "s" : ""} failed.`)
+      toast.success(t("messages.bulkUpdated", { count: ids.length }))
+    else toast.error(t("messages.failedBulkUpdate", { count: failed }))
     clearSelection()
   }
 
@@ -382,7 +395,7 @@ export default function RoomsPage() {
           amenities: payload.amenities,
         },
       })
-      toast.success("Room updated")
+      toast.success(t("messages.updated"))
       setIsEditDialogOpen(false)
       setSelectedRoom(null)
     } catch (err: unknown) {
@@ -391,7 +404,7 @@ export default function RoomsPage() {
           ? err.message
           : typeof err === "object" && err && "message" in err
             ? String((err as { message: unknown }).message)
-            : "Failed to update"
+            : t("messages.failedUpdate")
       toast.error(errorMessage)
     }
   }
@@ -448,7 +461,7 @@ export default function RoomsPage() {
               className="capitalize"
               variant={room.status === "available" ? "default" : "secondary"}
             >
-              {room.status}
+              {room.status === "available" ? t("available") : t("unavailable")}
             </Badge>
           </DraggableTableCell>
         )
@@ -460,7 +473,7 @@ export default function RoomsPage() {
                 variant="ghost"
                 size="icon"
                 onClick={() => handleView(room)}
-                aria-label="View room"
+                aria-label={t("viewRoom")}
               >
                 <EyeIcon className="size-4" />
               </Button>
@@ -468,7 +481,7 @@ export default function RoomsPage() {
                 variant="ghost"
                 size="icon"
                 onClick={() => handleEdit(room)}
-                aria-label="Edit room"
+                aria-label={t("editRoom")}
               >
                 <PencilIcon className="size-4" />
               </Button>
@@ -476,7 +489,7 @@ export default function RoomsPage() {
                 variant="ghost"
                 size="icon"
                 onClick={() => handleDeleteOpen(room)}
-                aria-label="Delete room"
+                aria-label={t("delete")}
               >
                 <Trash2 className="size-4" />
               </Button>
@@ -495,14 +508,14 @@ export default function RoomsPage() {
     if (!selectedRoom) return
     try {
       await deleteRoom.mutateAsync(Number(selectedRoom.id))
-      toast.success("Room deleted")
+      toast.success(t("messages.deleted"))
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
           ? err.message
           : typeof err === "object" && err && "message" in err
             ? String((err as { message: unknown }).message)
-            : "Failed to delete"
+            : t("messages.failedDelete")
       toast.error(errorMessage)
     } finally {
       setIsDeleteDialogOpen(false)
@@ -514,14 +527,14 @@ export default function RoomsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Rooms</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
           <p className="text-muted-foreground">
-            Manage rooms across your locations
+            {t("description")}
           </p>
         </div>
         <Button onClick={() => setIsDialogOpen(true)}>
           <DoorOpen className="me-2 h-4 w-4" />
-          Add Room
+          {t("addRoom")}
         </Button>
       </div>
 
@@ -533,7 +546,7 @@ export default function RoomsPage() {
                 <div className="relative max-w-sm flex-1">
                   <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
-                    placeholder="Search rooms..."
+                    placeholder={t("searchPlaceholder")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9"
@@ -545,7 +558,7 @@ export default function RoomsPage() {
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" size="sm">
                         <Filter className="h-4 w-4" />
-                        <span className="hidden lg:inline">Filters</span>
+                        <span className="hidden lg:inline">{t("filters")}</span>
                         {statusFilter !== "all" && (
                           <Badge className="ml-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs">
                             1
@@ -560,7 +573,7 @@ export default function RoomsPage() {
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex items-center justify-between">
-                          <h3 className="font-semibold">Filters</h3>
+                          <h3 className="font-semibold">{t("filters")}</h3>
                           {statusFilter !== "all" && (
                             <Button
                               variant="ghost"
@@ -569,13 +582,13 @@ export default function RoomsPage() {
                               className="h-7 text-xs"
                             >
                               <X className="mr-1 h-3 w-3" />
-                              Clear All
+                              {t("clearAll")}
                             </Button>
                           )}
                         </div>
 
                         <div className="space-y-2">
-                          <Label className="text-sm font-medium">Status</Label>
+                          <Label className="text-sm font-medium">{t("status")}</Label>
                           <div className="flex flex-wrap gap-2">
                             {statusOptions.map((s) => (
                               <Button
@@ -591,7 +604,7 @@ export default function RoomsPage() {
                                   )
                                 }
                               >
-                                {s}
+                                {s === "available" ? t("available") : t("unavailable")}
                               </Button>
                             ))}
                           </div>
@@ -605,9 +618,9 @@ export default function RoomsPage() {
                       <Button variant="outline" size="sm">
                         <Columns3Cog className="h-4 w-4" />
                         <span className="hidden lg:inline">
-                          Customize Columns
+                          {t("customizeColumns")}
                         </span>
-                        <span className="lg:hidden">Columns</span>
+                        <span className="lg:hidden">{t("columns")}</span>
                         <ChevronDown className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -631,10 +644,10 @@ export default function RoomsPage() {
               {statusFilter !== "all" && (
                 <div className="flex min-w-0 flex-wrap items-center gap-2">
                   <span className="text-xs text-muted-foreground">
-                    Active filters:
+                    {t("activeFilters")}
                   </span>
                   <Badge variant="secondary" className="text-xs capitalize">
-                    Status: {statusFilter}
+                    {t("status")}: {statusFilter === "available" ? t("available") : t("unavailable")}
                     <button
                       onClick={() => setStatusFilter("all")}
                       className="ml-1 rounded-full p-0.5 hover:bg-destructive/20"
@@ -650,14 +663,13 @@ export default function RoomsPage() {
               <div className="flex items-center justify-between border-b bg-muted/50 px-4 py-3">
                 <div className="flex items-center gap-3">
                   <Badge variant="secondary" className="text-sm font-medium">
-                    {selectedIds.size}{" "}
-                    {selectedIds.size === 1 ? "room" : "rooms"} selected
+                    {t("bulkSelected", { count: selectedIds.size })}
                   </Badge>
                   <button
                     onClick={clearSelection}
                     className="text-xs text-muted-foreground hover:text-foreground"
                   >
-                    Clear
+                    {t("clear")}
                   </button>
                 </div>
                 <div className="flex items-center gap-2">
@@ -665,7 +677,7 @@ export default function RoomsPage() {
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" size="sm">
                         <CheckCircle2 className="mr-2 h-4 w-4" />
-                        Change Status
+                        {t("changeStatus")}
                         <ChevronDown className="ml-2 h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -673,13 +685,13 @@ export default function RoomsPage() {
                       <DropdownMenuItem
                         onClick={() => handleBulkStatusChange("available")}
                       >
-                        Activate
+                        {t("activate")}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         onClick={() => handleBulkStatusChange("unavailable")}
                       >
-                        Deactivate
+                        {t("deactivate")}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -689,7 +701,7 @@ export default function RoomsPage() {
                     onClick={() => setIsBulkDeleteDialogOpen(true)}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
+                    {t("delete")}
                   </Button>
                 </div>
               </div>
@@ -745,7 +757,7 @@ export default function RoomsPage() {
                           className="py-8 text-center"
                         >
                           <p className="text-muted-foreground">
-                            No rooms found
+                            {t("noRoomsFound")}
                           </p>
                         </TableCell>
                       </TableRow>
