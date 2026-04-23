@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import {
   ArrowLeftIcon,
   CameraIcon,
@@ -197,6 +198,7 @@ async function uploadAvatarToStorage(
 }
 
 export default function ProfilePage() {
+  const t = useTranslations("profile")
   const router = useRouter()
   const [profile, setProfile] = React.useState<ProfileForm>(emptyProfile)
   const [authEmail, setAuthEmail] = React.useState("")
@@ -308,36 +310,43 @@ export default function ProfilePage() {
 
   const handleApplyAvatar = React.useCallback(async () => {
     if (!previewUrl || !croppedAreaPixels) {
-      toast.error("Select and crop an image first.")
+      toast.error(t("messages.selectCropFirst"))
       return
     }
 
     if (!userId) {
-      toast.error("Unable to upload avatar without a valid user.")
+      toast.error(t("messages.invalidUser"))
       return
     }
 
     const blob = await getCroppedImageBlob(previewUrl, croppedAreaPixels)
 
     if (!blob) {
-      toast.error("We could not process that image. Please try another one.")
+      toast.error(t("messages.avatarProcessError"))
       return
     }
 
     try {
       const publicUrl = await uploadAvatarToStorage(userId, blob)
       updateField("avatarUrl", publicUrl)
-      toast.success("Profile picture uploaded. Save changes to apply it.")
+      toast.success(t("messages.avatarUploadSuccess"))
       closeAvatarDialog()
     } catch (error) {
       console.error("Avatar upload failed", error)
       toast.error(
         error instanceof Error
           ? error.message
-          : "Failed to upload avatar. Please try again."
+          : t("messages.avatarUploadError")
       )
     }
-  }, [closeAvatarDialog, croppedAreaPixels, previewUrl, updateField, userId])
+  }, [
+    closeAvatarDialog,
+    croppedAreaPixels,
+    previewUrl,
+    updateField,
+    userId,
+    t,
+  ])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -368,7 +377,7 @@ export default function ProfilePage() {
     }
 
     setAuthEmail(profile.email)
-    toast.success("Profile updated.")
+    toast.success(t("messages.profileUpdated"))
     setIsSaving(false)
     setIsEditing(false)
   }
@@ -382,12 +391,12 @@ export default function ProfilePage() {
   const initials =
     `${profile.firstName?.[0] ?? ""}${profile.lastName?.[0] ?? ""}`.trim()
   const summaryFields = [
-    { label: "Email", value: profile.email, icon: MailIcon },
-    { label: "Phone", value: profile.phone, icon: PhoneIcon },
-    { label: "Location", value: profile.location, icon: MapPinIcon },
-    { label: "Role", value: profile.role, icon: SparklesIcon },
+    { label: t("emailAddress"), value: profile.email, icon: MailIcon },
+    { label: t("phone"), value: profile.phone, icon: PhoneIcon },
+    { label: t("location"), value: profile.location, icon: MapPinIcon },
+    { label: t("role"), value: profile.role, icon: SparklesIcon },
   ].filter((field) => field.value.trim().length > 0)
-  const aboutMessage = profile.bio.trim() || "No bio has been added yet."
+  const aboutMessage = profile.bio.trim() || t("noBio")
 
   if (isLoading) {
     return (
@@ -400,17 +409,15 @@ export default function ProfilePage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={isEditing ? "Edit Profile" : "Profile"}
+        title={isEditing ? t("editProfile") : t("title")}
         description={
-          isEditing
-            ? "Update your personal and contact information."
-            : "View your personal account details. Use edit to update your profile."
+          isEditing ? t("editDescription") : t("description")
         }
         action={
           isEditing ? (
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <Button type="button" variant="secondary" onClick={handleCancel}>
-                Cancel
+                {t("cancelButton")}
               </Button>
               <Button type="submit" form="profile-form" disabled={isSaving}>
                 {isSaving ? (
@@ -418,7 +425,7 @@ export default function ProfilePage() {
                 ) : (
                   <ShieldCheckIcon data-icon="inline-start" />
                 )}
-                Save changes
+                {t("saveButton")}
               </Button>
             </div>
           ) : (
@@ -428,7 +435,7 @@ export default function ProfilePage() {
               onClick={() => setIsEditing(true)}
             >
               <PencilIcon data-icon="inline-start" />
-              Edit profile
+              {t("editButton")}
             </Button>
           )
         }
@@ -437,9 +444,9 @@ export default function ProfilePage() {
       <div className="grid gap-6 xl:grid-cols-[320px_1fr]">
         <Card className="h-full">
           <CardHeader>
-            <CardTitle>Profile summary</CardTitle>
+            <CardTitle>{t("profileSummary")}</CardTitle>
             <CardDescription>
-              Review your role, contact details, and account status.
+              {t("summaryDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -447,7 +454,7 @@ export default function ProfilePage() {
               <div className="relative">
                 <button
                   aria-label={
-                    isEditing ? "Change profile picture" : "Profile picture"
+                    isEditing ? t("changePhoto") : t("title")
                   }
                   className={cn(
                     "relative rounded-full transition",
@@ -467,7 +474,7 @@ export default function ProfilePage() {
                   <Avatar className="size-20 data-[dragging=true]:bg-accent/50">
                     {profile.avatarUrl ? (
                       <AvatarImage
-                        alt={`${fullName || "User"} profile picture`}
+                        alt={`${fullName || t("unknownUser")} profile picture`}
                         src={profile.avatarUrl}
                       />
                     ) : null}
@@ -479,7 +486,7 @@ export default function ProfilePage() {
                     </span>
                   ) : null}
                 </button>
-
+ 
                 <input
                   {...getInputProps({ disabled: !isEditing })}
                   aria-label="Upload profile picture"
@@ -492,7 +499,7 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-2">
                   <Button onClick={openFileDialog} size="sm" type="button">
                     <CameraIcon data-icon="inline-start" />
-                    Change photo
+                    {t("changePhoto")}
                   </Button>
                   {profile.avatarUrl ? (
                     <Button
@@ -502,7 +509,7 @@ export default function ProfilePage() {
                       variant="secondary"
                     >
                       <XIcon data-icon="inline-start" />
-                      Remove
+                      {t("removePhoto")}
                     </Button>
                   ) : null}
                 </div>
@@ -510,7 +517,7 @@ export default function ProfilePage() {
 
               <div className="min-w-0">
                 <p className="text-lg leading-none font-semibold">
-                  {fullName || "Unknown user"}
+                  {fullName || t("unknownUser")}
                 </p>
                 {profile.role ? (
                   <p className="text-sm text-muted-foreground">
@@ -533,7 +540,7 @@ export default function ProfilePage() {
                 ))
               ) : (
                 <p className="text-center text-sm text-muted-foreground">
-                  No summary data available.
+                  {t("noSummaryData")}
                 </p>
               )}
             </div>
@@ -542,11 +549,11 @@ export default function ProfilePage() {
 
         <Card className="h-full">
           <CardHeader>
-            <CardTitle>{isEditing ? "Personal details" : "About"}</CardTitle>
+            <CardTitle>{isEditing ? t("personalDetails") : t("about")}</CardTitle>
             <CardDescription>
               {isEditing
-                ? "Edit your name, email address, phone number, and profile note."
-                : "These are the details stored for your account."}
+                ? t("detailsDescription")
+                : t("aboutDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -558,7 +565,7 @@ export default function ProfilePage() {
               >
                 <FieldGroup>
                   <Field>
-                    <FieldLabel htmlFor="first-name">First name</FieldLabel>
+                    <FieldLabel htmlFor="first-name">{t("firstName")}</FieldLabel>
                     <FieldContent>
                       <Input
                         id="first-name"
@@ -571,7 +578,7 @@ export default function ProfilePage() {
                   </Field>
 
                   <Field>
-                    <FieldLabel htmlFor="last-name">Last name</FieldLabel>
+                    <FieldLabel htmlFor="last-name">{t("lastName")}</FieldLabel>
                     <FieldContent>
                       <Input
                         id="last-name"
@@ -584,7 +591,7 @@ export default function ProfilePage() {
                   </Field>
 
                   <Field>
-                    <FieldLabel htmlFor="email">Email address</FieldLabel>
+                    <FieldLabel htmlFor="email">{t("emailAddress")}</FieldLabel>
                     <FieldContent>
                       <Input
                         id="email"
@@ -596,29 +603,29 @@ export default function ProfilePage() {
                       />
                     </FieldContent>
                     <FieldDescription>
-                      This address is used for account notifications and login.
+                      {t("emailDescription")}
                     </FieldDescription>
                   </Field>
 
                   <Field>
-                    <FieldLabel htmlFor="phone">Phone number</FieldLabel>
+                    <FieldLabel htmlFor="phone">{t("phone")}</FieldLabel>
                     <FieldContent>
                       <PhoneInput
                         id="phone"
                         defaultCountry="SA"
                         international
-                        placeholder="+966 5 5555 5555"
+                        placeholder={t("phonePlaceholder")}
                         value={profile.phone}
                         onChange={(value) => updateField("phone", value || "")}
                       />
                     </FieldContent>
                     <FieldDescription>
-                      Optional phone number for account recovery and support.
+                      {t("phoneDescription")}
                     </FieldDescription>
                   </Field>
 
                   <Field>
-                    <FieldLabel htmlFor="location">Location</FieldLabel>
+                    <FieldLabel htmlFor="location">{t("location")}</FieldLabel>
                     <FieldContent>
                       <Input
                         id="location"
@@ -631,7 +638,7 @@ export default function ProfilePage() {
                   </Field>
 
                   <Field>
-                    <FieldLabel htmlFor="bio">About you</FieldLabel>
+                    <FieldLabel htmlFor="bio">{t("bio")}</FieldLabel>
                     <FieldContent>
                       <Textarea
                         id="bio"
@@ -643,8 +650,7 @@ export default function ProfilePage() {
                       />
                     </FieldContent>
                     <FieldDescription>
-                      Write a short summary that helps your team understand your
-                      role.
+                      {t("bioDescription")}
                     </FieldDescription>
                   </Field>
                 </FieldGroup>
@@ -652,11 +658,11 @@ export default function ProfilePage() {
             ) : (
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">Full name</p>
-                  <p>{fullName || "Unknown user"}</p>
+                  <p className="text-sm text-muted-foreground">{t("firstName")} {t("lastName")}</p>
+                  <p>{fullName || t("unknownUser")}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Bio</p>
+                  <p className="text-sm text-muted-foreground">{t("bio")}</p>
                   <p>{aboutMessage}</p>
                 </div>
               </div>
@@ -668,13 +674,13 @@ export default function ProfilePage() {
       <Dialog onOpenChange={setIsAvatarDialogOpen} open={isAvatarDialogOpen}>
         <DialogContent className="gap-0 p-0 sm:max-w-140 *:[button]:hidden">
           <DialogDescription className="sr-only">
-            Crop your profile picture before saving.
+            {t("cropDescription")}
           </DialogDescription>
           <DialogHeader className="contents space-y-0 text-start">
             <DialogTitle className="flex items-center justify-between border-b p-4 text-base">
               <div className="flex items-center gap-2">
                 <Button
-                  aria-label="Cancel"
+                  aria-label={t("cancelButton")}
                   className="-my-1 opacity-60"
                   onClick={closeAvatarDialog}
                   size="icon"
@@ -683,7 +689,7 @@ export default function ProfilePage() {
                 >
                   <ArrowLeftIcon />
                 </Button>
-                <span>Crop profile picture</span>
+                <span>{t("cropTitle")}</span>
               </div>
               <Button
                 className="-my-1"
@@ -691,7 +697,7 @@ export default function ProfilePage() {
                 onClick={handleApplyAvatar}
                 type="button"
               >
-                Apply
+                {t("apply")}
               </Button>
             </DialogTitle>
           </DialogHeader>
@@ -718,7 +724,7 @@ export default function ProfilePage() {
                 size={16}
               />
               <Slider
-                aria-label="Zoom"
+                aria-label={t("zoom")}
                 max={3}
                 min={1}
                 onValueChange={(value) => setZoom(value[0] ?? 1)}

@@ -2,6 +2,8 @@
 
 import * as React from "react"
 import { usePathname } from "next/navigation"
+import { useTranslations } from "next-intl"
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -21,6 +23,7 @@ function formatBreadcrumbLabel(segment: string): string {
 }
 
 export function AppBreadcrumb() {
+  const t = useTranslations("breadcrumbs")
   const pathname = usePathname()
 
   // Remove the leading slash and split into segments
@@ -35,7 +38,7 @@ export function AppBreadcrumb() {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbPage>Admin</BreadcrumbPage>
+            <BreadcrumbPage>{t("admin")}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -46,7 +49,12 @@ export function AppBreadcrumb() {
   const breadcrumbItems = segments.map((segment, index) => {
     const isLast = index === segments.length - 1
     const href = "/" + segments.slice(0, index + 1).join("/")
-    const label = formatBreadcrumbLabel(segment)
+    
+    // Try to translate the segment, fallback to formatted label if not found
+    // Note: next-intl t() returns the key itself if missing by default in most configs
+    const label = t(segment) === `breadcrumbs.${segment}` || t(segment) === segment
+      ? formatBreadcrumbLabel(segment)
+      : t(segment)
 
     return {
       label,
