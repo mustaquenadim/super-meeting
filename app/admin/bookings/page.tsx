@@ -1490,7 +1490,7 @@ export default function BookingsPage() {
               <Field>
                 <FieldLabel htmlFor="edit-date">{t("dialogs.edit.date")}</FieldLabel>
                 <Popover>
-                  <PopoverTrigger>
+                  <PopoverTrigger asChild>
                     <Button
                       id="edit-date"
                       variant="outline"

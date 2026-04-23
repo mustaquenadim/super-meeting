@@ -812,6 +812,8 @@
     "settings": "Settings",
     "general": "General",
     "profile": "Profile",
-    "edit": "Edit"
+    "edit": "Edit",
+    "new": "New",
+    "roles": "Roles"
   }
 }
