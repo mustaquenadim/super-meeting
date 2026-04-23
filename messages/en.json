@@ -780,6 +780,23 @@
       "invalidUser": "Unable to upload avatar without a valid user."
     }
   },
+  "settings": {
+    "title": "General Settings",
+    "description": "Manage your platform preferences including theme and language.",
+    "appearance": "Appearance",
+    "appearanceDescription": "Customize how the platform looks for you.",
+    "theme": "Theme",
+    "themeDescription": "Select your preferred color theme.",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "language": "Language",
+    "languageDescription": "Choose your preferred language for the interface.",
+    "en": "English",
+    "ar": "Arabic",
+    "saveChanges": "Save changes",
+    "saved": "Settings saved successfully."
+  },
   "breadcrumbs": {
     "admin": "Admin",
     "dashboard": "Dashboard",

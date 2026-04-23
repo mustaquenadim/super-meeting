@@ -88,9 +88,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: t("nav.settings"),
         url: "/admin/settings",
         icon: <Settings2Icon />,
-        items: [
-          { title: t("nav.settingsGeneral"), url: "/admin/settings/general" },
-        ],
       },
     ],
     [t]

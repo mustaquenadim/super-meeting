@@ -1,11 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { SaveIcon } from "lucide-react"
+import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react"
+import { useTheme } from "next-themes"
+import { useLocale, useTranslations } from "next-intl"
 import { toast } from "sonner"
 
 import { PageHeader } from "@/components/layouts/page-header"
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -13,161 +14,143 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Spinner } from "@/components/ui/spinner"
-
-type GeneralSettingsForm = {
-  companyName: string
-  companyWebsite: string
-  supportEmail: string
-  supportPhone: string
-  defaultTimezone: string
-  currency: string
-  dateFormat: string
-  timeFormat: string
-  autoConfirmBookings: boolean
-  sendEmailConfirmations: boolean
-  enableWaitlist: boolean
-  enableRecurringBookings: boolean
-  maintenanceMode: boolean
-  maintenanceMessage: string
-}
-
-const INITIAL_SETTINGS: GeneralSettingsForm = {
-  companyName: "Super Office",
-  companyWebsite: "https://superoffice.com",
-  supportEmail: "support@superoffice.com",
-  supportPhone: "+1 (555) 000-0000",
-  defaultTimezone: "America/New_York",
-  currency: "USD",
-  dateFormat: "MM/DD/YYYY",
-  timeFormat: "12h",
-  autoConfirmBookings: false,
-  sendEmailConfirmations: true,
-  enableWaitlist: true,
-  enableRecurringBookings: true,
-  maintenanceMode: false,
-  maintenanceMessage: "Platform is undergoing scheduled maintenance...",
-}
-
-function SettingsCard({
-  title,
-  description,
-  children,
-}: {
-  title: string
-  description: string
-  children: React.ReactNode
-}) {
-  return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardContent>{children}</CardContent>
-    </Card>
-  )
-}
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { useRouter } from "@/i18n/navigation"
+import { AppLocale } from "@/i18n/routing"
+import { LOCALE_COOKIE } from "@/lib/auth/cookies"
+import { cn } from "@/lib/utils"
 
 export default function GeneralSettingsPage() {
-  const [settings, setSettings] = React.useState(INITIAL_SETTINGS)
-  const [isSaving, setIsSaving] = React.useState(false)
+  const t = useTranslations("settings")
+  const { theme, setTheme } = useTheme()
+  const locale = useLocale() as AppLocale
+  const router = useRouter()
+  const [mounted, setMounted] = React.useState(false)
 
-  const updateField = React.useCallback(
-    <K extends keyof GeneralSettingsForm>(
-      key: K,
-      value: GeneralSettingsForm[K]
-    ) => {
-      setSettings((current) => ({ ...current, [key]: value }))
-    },
-    []
-  )
+  // Avoid hydration mismatch
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setIsSaving(true)
+  const handleLocaleChange = (nextLocale: AppLocale) => {
+    if (nextLocale === locale) return
 
-    // Keep this UI interactive until a persisted settings endpoint is wired in.
-    await new Promise((resolve) => window.setTimeout(resolve, 400))
+    const secure = window.location.protocol === "https:" ? "; Secure" : ""
+    document.cookie = `${LOCALE_COOKIE}=${nextLocale}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax${secure}`
+    router.refresh()
+    toast.success(t("saved"))
+  }
 
-    toast.success("General settings saved locally.")
-    setIsSaving(false)
+  if (!mounted) {
+    return null
   }
 
   return (
-    <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+    <div className="flex flex-col gap-6">
       <PageHeader
-        title="General Settings"
-        description="Configure platform-wide settings"
-        action={
-          <Button type="submit" disabled={isSaving}>
-            {isSaving ? (
-              <Spinner data-icon="inline-start" />
-            ) : (
-              <SaveIcon data-icon="inline-start" />
-            )}
-            Save Changes
-          </Button>
-        }
+        title={t("title")}
+        description={t("description")}
       />
 
-      <div className="grid gap-6 xl:grid-cols-2">
-        <SettingsCard
-          title="Company Information"
-          description="Basic company and platform details"
-        >
-          <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="company-name">Company Name</FieldLabel>
-              <Input
-                id="company-name"
-                value={settings.companyName}
-                onChange={(event) =>
-                  updateField("companyName", event.target.value)
-                }
-              />
-            </Field>
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("appearance")}</CardTitle>
+            <CardDescription>{t("appearanceDescription")}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-3">
+              <Label>{t("theme")}</Label>
+              <p className="text-xs text-muted-foreground">
+                {t("themeDescription")}
+              </p>
+              <RadioGroup
+                value={theme}
+                onValueChange={(value) => {
+                  setTheme(value)
+                  toast.success(t("saved"))
+                }}
+                className="grid max-w-md grid-cols-3 gap-4"
+              >
+                <div>
+                  <Label
+                    className={cn(
+                      "flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary",
+                      theme === "light" && "border-primary"
+                    )}
+                  >
+                    <RadioGroupItem value="light" className="sr-only" />
+                    <SunIcon className="mb-3 size-6" />
+                    <span className="text-sm font-medium">{t("light")}</span>
+                  </Label>
+                </div>
+                <div>
+                  <Label
+                    className={cn(
+                      "flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary",
+                      theme === "dark" && "border-primary"
+                    )}
+                  >
+                    <RadioGroupItem value="dark" className="sr-only" />
+                    <MoonIcon className="mb-3 size-6" />
+                    <span className="text-sm font-medium">{t("dark")}</span>
+                  </Label>
+                </div>
+                <div>
+                  <Label
+                    className={cn(
+                      "flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary",
+                      theme === "system" && "border-primary"
+                    )}
+                  >
+                    <RadioGroupItem value="system" className="sr-only" />
+                    <MonitorIcon className="mb-3 size-6" />
+                    <span className="text-sm font-medium">{t("system")}</span>
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
 
-            <Field>
-              <FieldLabel htmlFor="company-website">Company Website</FieldLabel>
-              <Input
-                id="company-website"
-                type="url"
-                value={settings.companyWebsite}
-                onChange={(event) =>
-                  updateField("companyWebsite", event.target.value)
-                }
-              />
-            </Field>
-
-            <Field>
-              <FieldLabel htmlFor="support-email">Support Email</FieldLabel>
-              <Input
-                id="support-email"
-                type="email"
-                value={settings.supportEmail}
-                onChange={(event) =>
-                  updateField("supportEmail", event.target.value)
-                }
-              />
-            </Field>
-
-            <Field>
-              <FieldLabel htmlFor="support-phone">Support Phone</FieldLabel>
-              <Input
-                id="support-phone"
-                type="tel"
-                value={settings.supportPhone}
-                onChange={(event) =>
-                  updateField("supportPhone", event.target.value)
-                }
-              />
-            </Field>
-          </FieldGroup>
-        </SettingsCard>
+            <div className="space-y-3">
+              <Label>{t("language")}</Label>
+              <p className="text-xs text-muted-foreground">
+                {t("languageDescription")}
+              </p>
+              <RadioGroup
+                value={locale}
+                onValueChange={(value) => handleLocaleChange(value as AppLocale)}
+                className="grid max-w-md grid-cols-2 gap-4"
+              >
+                <div>
+                  <Label
+                    className={cn(
+                      "flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary",
+                      locale === "en" && "border-primary"
+                    )}
+                  >
+                    <RadioGroupItem value="en" className="sr-only" />
+                    <span className="mb-3 text-2xl">🇺🇸</span>
+                    <span className="text-sm font-medium">{t("en")}</span>
+                  </Label>
+                </div>
+                <div>
+                  <Label
+                    className={cn(
+                      "flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary",
+                      locale === "ar" && "border-primary"
+                    )}
+                  >
+                    <RadioGroupItem value="ar" className="sr-only" />
+                    <span className="mb-3 text-2xl">🇸🇦</span>
+                    <span className="text-sm font-medium">{t("ar")}</span>
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </form>
+    </div>
   )
 }
